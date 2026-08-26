@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  brew-and-bean:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: brew_and_bean_cafe
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - JWT_SECRET=brew_bean_secret_key_2026
+      - WHATSAPP_OWNER_PHONE=918639098389
+    volumes:
+      - ./cafe_store.json:/app/cafe_store.json
