@@ -26,7 +26,14 @@ export default function App() {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
-  const isStaffRoute = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/staff');
+  // Check URL path or query parameter ?page=admin for staff route compatibility
+  const urlParams = new URLSearchParams(window.location.search);
+  const isStaffRoute = 
+    window.location.pathname.includes('/admin') || 
+    window.location.pathname.includes('/staff') ||
+    urlParams.get('page') === 'admin' ||
+    urlParams.get('page') === 'staff' ||
+    window.location.hash.includes('admin');
 
   useEffect(() => {
     fetchMenuData();

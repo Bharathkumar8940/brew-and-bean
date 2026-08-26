@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Coffee, ShoppingBag, Menu as MenuIcon, X, Calendar, Shield, Sparkles } from 'lucide-react';
+import { Coffee, ShoppingBag, Menu as MenuIcon, X, Calendar, Shield } from 'lucide-react';
 
 interface NavbarProps {
   onOpenOrderModal: () => void;
@@ -39,7 +39,6 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Brand Logo with Shining Glow */}
         <a href="#hero" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-coffee-800 via-caramel to-amber-400 flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform shine-gold-border">
             <Coffee className="w-5 h-5 text-cream animate-pulse" />
@@ -49,12 +48,11 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
               BREW & BEAN
             </span>
             <span className="text-[10px] tracking-[0.25em] text-coffee-300 uppercase -mt-1 flex items-center gap-1">
-              Craft Café <Sparkles className="w-2.5 h-2.5 text-caramel inline" />
+              Craft Café
             </span>
           </div>
         </a>
 
-        {/* Desktop Nav Links */}
         <div className="hidden lg:flex items-center gap-6">
           {navLinks.map((link) => (
             <a
@@ -67,11 +65,9 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
           ))}
         </div>
 
-        {/* Action Buttons with Shining Shimmer */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="/admin"
-            target="_blank"
+            href="./?page=admin"
             className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-coffee-300 hover:text-caramel transition-colors px-3.5 py-2 border border-coffee-800 rounded-full hover:border-caramel/50 backdrop-blur-sm"
           >
             <Shield className="w-3.5 h-3.5" /> Staff Portal
@@ -94,7 +90,6 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
           </button>
         </div>
 
-        {/* Mobile Hamburger Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="lg:hidden p-2 text-cream hover:text-caramel focus:outline-none"
@@ -104,7 +99,6 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
         </button>
       </div>
 
-      {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-espresso/98 backdrop-blur-xl border-b border-coffee-800 px-6 py-6 transition-all">
           <div className="flex flex-col gap-4">
@@ -119,6 +113,14 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
               </a>
             ))}
             <div className="pt-4 border-t border-coffee-800 flex flex-col gap-3">
+              <a
+                href="./?page=admin"
+                className="w-full flex items-center justify-center gap-2 border border-coffee-700 text-coffee-300 py-3 rounded-full font-medium"
+              >
+                <Shield className="w-4 h-4" />
+                Staff Portal
+              </a>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
