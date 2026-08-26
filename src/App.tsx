@@ -7,7 +7,6 @@ import DynamicMenuSection, { type MenuItemData } from './components/DynamicMenuS
 import CafeExperience from './components/CafeExperience';
 import WhyUs from './components/WhyUs';
 import Testimonials from './components/Testimonials';
-import SpecialOffer from './components/SpecialOffer';
 import Gallery from './components/Gallery';
 import Location from './components/Location';
 import FinalCTA from './components/FinalCTA';
@@ -26,7 +25,6 @@ export default function App() {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
-  // Check URL path or query parameter ?page=admin for staff route compatibility
   const urlParams = new URLSearchParams(window.location.search);
   const isStaffRoute = 
     window.location.pathname.includes('/admin') || 
@@ -121,8 +119,6 @@ export default function App() {
         <CafeExperience />
         <WhyUs />
         <Testimonials />
-
-        <SpecialOffer onOpenOrderModal={() => setIsCartModalOpen(true)} />
 
         <EventsSection />
 

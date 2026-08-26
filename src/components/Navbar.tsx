@@ -24,7 +24,6 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
     { name: 'Menu', href: '#food-menu' },
     { name: 'Reservations', href: '#reservations-section' },
     { name: 'Experience', href: '#experience' },
-    { name: 'Offers', href: '#special-offer' },
     { name: 'Events', href: '#events-section' },
     { name: 'Gallery', href: '#gallery' },
     { name: 'Contact', href: '#location' },
