@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Calendar, Utensils, Table, ShoppingBag, Tag, Bell, LogOut, Trash2 } from 'lucide-react';
+import { LayoutDashboard, Calendar, Utensils, Table, ShoppingBag, Tag, Bell, LogOut, Trash2, Info } from 'lucide-react';
+import { defaultCafeConfig } from '../cafeConfig';
 
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('staff_token'));
@@ -9,13 +10,41 @@ export default function AdminDashboard() {
   
   const [activeTab, setActiveTab] = useState<'metrics' | 'tables' | 'reservations' | 'orders' | 'menu' | 'coupons' | 'notifications'>('metrics');
 
-  const [metrics, setMetrics] = useState<any>(null);
-  const [tables, setTables] = useState<any[]>([]);
-  const [reservations, setReservations] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>([]);
-  const [coupons, setCoupons] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<any>({
+    revenue: 14850,
+    orders: 38,
+    reservations: 12,
+    availableTables: 4,
+    occupiedTables: 3
+  });
+
+  const [tables, setTables] = useState<any[]>([
+    { id: 't1', tableNumber: 1, seats: 2, status: 'Occupied' },
+    { id: 't2', tableNumber: 2, seats: 4, status: 'Available' },
+    { id: 't3', tableNumber: 3, seats: 4, status: 'Reserved' },
+    { id: 't4', tableNumber: 4, seats: 6, status: 'Available' },
+    { id: 't5', tableNumber: 5, seats: 2, status: 'Occupied' },
+    { id: 't6', tableNumber: 6, seats: 8, status: 'Cleaning' },
+    { id: 't7', tableNumber: 7, seats: 4, status: 'Available' }
+  ]);
+
+  const [reservations, setReservations] = useState<any[]>([
+    { id: 'r1', reservationNumber: 'BB-1024', customerName: 'Sample Guest (Demo)', customerPhone: defaultCafeConfig.contact.phone, reservationDate: '2026-09-05', reservationTime: '7:30 PM', guests: 4, tableNumber: 3, status: 'Confirmed', specialRequest: 'Window table request' }
+  ]);
+
+  const [orders, setOrders] = useState<any[]>([
+    { id: 'o1', orderNumber: 'ORD-1088', customerName: 'Sample Guest (Demo)', orderType: 'Dine-in', items: [{ id: 'c2', name: 'Velvet Cappuccino', quantity: 2, unitPrice: 210 }], totalAmount: 441, orderStatus: 'Preparing', createdAt: new Date().toISOString() }
+  ]);
+
+  const [menuItems, setMenuItems] = useState<any[]>(defaultCafeConfig.menuItems);
+
+  const [coupons] = useState<any[]>([
+    { id: 'cp1', code: 'WELCOME50', discountPercent: 20, maxUsage: 100, currentUsage: 24 }
+  ]);
+
+  const [notifications] = useState<any[]>([
+    { id: 'n1', title: 'System Notification Log (Demo)', message: 'WhatsApp Manager Notification Dispatched to ' + defaultCafeConfig.contact.phone, createdAt: new Date().toISOString() }
+  ]);
 
   const [newMenuName, setNewMenuName] = useState('');
   const [newMenuPrice, setNewMenuPrice] = useState('');
@@ -27,24 +56,15 @@ export default function AdminDashboard() {
     }
   }, [token, activeTab]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setToken(data.token);
-        localStorage.setItem('staff_token', data.token);
-        setLoginError('');
-      } else {
-        setLoginError(data.error);
-      }
-    } catch (e) {
-      setLoginError('Server connection error');
+    if (email && password) {
+      const demoToken = 'demo_jwt_token_2026';
+      setToken(demoToken);
+      localStorage.setItem('staff_token', demoToken);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid login details');
     }
   };
 
@@ -55,79 +75,63 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async () => {
     try {
-      const [mRes, tRes, rRes, oRes, menuRes, cRes, nRes] = await Promise.all([
+      const [mRes, tRes, rRes, oRes, menuRes] = await Promise.all([
         fetch('http://localhost:5000/api/admin/metrics'),
         fetch('http://localhost:5000/api/admin/tables'),
         fetch('http://localhost:5000/api/admin/reservations'),
         fetch('http://localhost:5000/api/admin/orders'),
-        fetch('http://localhost:5000/api/menu'),
-        fetch('http://localhost:5000/api/admin/coupons'),
-        fetch('http://localhost:5000/api/admin/notifications'),
+        fetch('http://localhost:5000/api/menu')
       ]);
 
-      setMetrics(await mRes.json());
-      setTables(await tRes.json());
-      setReservations(await rRes.json());
-      setOrders(await oRes.json());
-      const menuData = await menuRes.json();
-      setMenuItems(menuData.items);
-      setCoupons(await cRes.json());
-      setNotifications(await nRes.json());
+      if (mRes.ok) setMetrics(await mRes.json());
+      if (tRes.ok) setTables(await tRes.json());
+      if (rRes.ok) setReservations(await rRes.json());
+      if (oRes.ok) setOrders(await oRes.json());
+      if (menuRes.ok) {
+        const menuData = await menuRes.json();
+        if (menuData.items && menuData.items.length > 0) setMenuItems(menuData.items);
+      }
     } catch (err) {
-      console.error(err);
+      // Fallback cleanly to built-in sample demo metrics if backend API is not running
     }
   };
 
-  const updateTableStatus = async (id: string, status: string) => {
-    await fetch(`http://localhost:5000/api/admin/tables/${id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    fetchAdminData();
+  const updateTableStatus = (id: string, status: string) => {
+    setTables(prev => prev.map(t => t.id === id ? { ...t, status } : t));
   };
 
-  const updateReservationStatus = async (id: string, status: string) => {
-    await fetch(`http://localhost:5000/api/admin/reservations/${id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    fetchAdminData();
+  const updateReservationStatus = (id: string, status: string) => {
+    setReservations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
   };
 
-  const updateOrderStatus = async (id: string, orderStatus: string) => {
-    await fetch(`http://localhost:5000/api/admin/orders/${id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderStatus }),
-    });
-    fetchAdminData();
+  const updateOrderStatus = (id: string, orderStatus: string) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, orderStatus } : o));
   };
 
-  const handleCreateMenuItem = async (e: React.FormEvent) => {
+  const handleCreateMenuItem = (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('http://localhost:5000/api/admin/menu', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        categoryId: 'cat-1',
-        name: newMenuName,
-        price: Number(newMenuPrice),
-        description: newMenuDesc,
-        image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80',
-        isVegetarian: true,
-      }),
-    });
+    if (!newMenuName || !newMenuPrice) return;
+
+    const newItem = {
+      id: `m-custom-${Date.now()}`,
+      categoryId: 'coffee',
+      name: newMenuName,
+      price: Number(newMenuPrice),
+      description: newMenuDesc || 'Freshly prepared specialty offering.',
+      image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80',
+      isVegetarian: true,
+      isPopular: false,
+      isAvailable: true
+    };
+
+    setMenuItems(prev => [newItem, ...prev]);
     setNewMenuName('');
     setNewMenuPrice('');
     setNewMenuDesc('');
-    fetchAdminData();
   };
 
-  const handleDeleteMenuItem = async (id: string) => {
-    await fetch(`http://localhost:5000/api/admin/menu/${id}`, { method: 'DELETE' });
-    fetchAdminData();
+  const handleDeleteMenuItem = (id: string) => {
+    setMenuItems(prev => prev.filter(m => m.id !== id));
   };
 
   if (!token) {
@@ -135,13 +139,23 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-espresso flex items-center justify-center p-6 text-cream">
         <div className="w-full max-w-md bg-coffee-950 p-8 rounded-3xl border border-coffee-800 shadow-3d">
           <div className="text-center">
-            <h2 className="font-serif text-3xl font-bold">Brew & Bean Admin</h2>
-            <p className="text-xs text-coffee-300 mt-1">Staff Portal & Table Management Login</p>
+            <span className="text-[10px] uppercase font-bold tracking-widest text-caramel px-3 py-1 rounded-full bg-coffee-900 border border-coffee-800">
+              Demo Admin Portal Preview
+            </span>
+            <h2 className="font-serif text-3xl font-bold mt-3">Staff Management Portal</h2>
+            <p className="text-xs text-coffee-300 mt-1">Interactive demonstration of café operational dashboard</p>
           </div>
 
-          <form onSubmit={handleLogin} className="mt-6 space-y-4">
+          <div className="mt-4 p-3 rounded-2xl bg-espresso/80 border border-coffee-800/80 text-[11px] text-coffee-300 flex items-start gap-2">
+            <Info className="w-4 h-4 text-caramel shrink-0 mt-0.5" />
+            <span>
+              <strong>Demo Credentials:</strong> Click "Log In to Portal" using pre-filled credentials to explore staff management functions.
+            </span>
+          </div>
+
+          <form onSubmit={handleLogin} className="mt-5 space-y-4">
             <div>
-              <label className="block text-xs uppercase font-semibold text-coffee-300 mb-1">Email</label>
+              <label className="block text-xs uppercase font-semibold text-coffee-300 mb-1">Staff Email</label>
               <input
                 type="email"
                 required
@@ -168,11 +182,11 @@ export default function AdminDashboard() {
               type="submit"
               className="w-full py-3.5 rounded-2xl bg-caramel hover:bg-coffee-500 text-white font-bold text-xs uppercase tracking-widest shadow-glow transition-all"
             >
-              Log In to Portal
+              Log In to Portal (Demo)
             </button>
           </form>
-          <div className="mt-4 text-center">
-            <a href="/" className="text-xs text-coffee-400 hover:text-caramel">← Back to Customer Website</a>
+          <div className="mt-5 text-center">
+            <a href="./" className="text-xs text-coffee-400 hover:text-caramel">← Return to Main Website</a>
           </div>
         </div>
       </div>
@@ -188,12 +202,12 @@ export default function AdminDashboard() {
               B
             </div>
             <div>
-              <h3 className="font-serif font-bold text-base">Brew & Bean</h3>
-              <span className="text-[10px] text-caramel uppercase tracking-widest font-semibold">Staff Portal</span>
+              <h3 className="font-serif font-bold text-base">{defaultCafeConfig.brand.name}</h3>
+              <span className="text-[10px] text-caramel uppercase tracking-widest font-semibold">Staff Portal (Demo)</span>
             </div>
           </div>
 
-          <nav className="mt-8 space-y-1.5">
+          <nav className="mt-6 space-y-1">
             {[
               { id: 'metrics', name: 'Overview', icon: LayoutDashboard },
               { id: 'tables', name: 'Table Map', icon: Table },
@@ -201,7 +215,7 @@ export default function AdminDashboard() {
               { id: 'orders', name: 'Live Orders', icon: ShoppingBag },
               { id: 'menu', name: 'Menu Editor', icon: Utensils },
               { id: 'coupons', name: 'Coupons', icon: Tag },
-              { id: 'notifications', name: 'WhatsApp Logs', icon: Bell },
+              { id: 'notifications', name: 'System Logs', icon: Bell },
             ].map((item) => {
               const Icon = item.icon;
               return (
@@ -224,24 +238,24 @@ export default function AdminDashboard() {
           onClick={handleLogout}
           className="flex items-center gap-2 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-6 border-t border-coffee-800"
         >
-          <LogOut className="w-4 h-4" /> Log Out
+          <LogOut className="w-4 h-4" /> Exit Portal Demo
         </button>
       </aside>
 
-      <main className="flex-1 p-10 overflow-y-auto">
+      <main className="flex-1 p-8 sm:p-10 overflow-y-auto">
         
-        <div className="flex items-center justify-between pb-8 border-b border-coffee-900">
+        <div className="flex items-center justify-between pb-6 border-b border-coffee-900">
           <div>
-            <h1 className="font-serif text-3xl font-bold">Café Staff Management Dashboard</h1>
-            <p className="text-xs text-coffee-300 mt-1">Real-time table status, live orders & WhatsApp notification logs</p>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">Café Staff Management Dashboard</h1>
+            <p className="text-xs text-coffee-300 mt-1">Interactive staff interface preview for table status, live orders & menu edits</p>
           </div>
 
-          <a href="/" target="_blank" className="px-4 py-2 rounded-full border border-caramel/50 text-caramel hover:bg-caramel hover:text-white text-xs font-semibold uppercase transition-colors">
-            View Live Website ↗
+          <a href="./" className="px-4 py-2 rounded-full border border-caramel/50 text-caramel hover:bg-caramel hover:text-white text-xs font-semibold uppercase transition-colors">
+            View Website Demo ↗
           </a>
         </div>
 
-        {activeTab === 'metrics' && metrics && (
+        {activeTab === 'metrics' && (
           <div className="mt-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="p-6 rounded-3xl bg-coffee-950 border border-coffee-800">
@@ -262,7 +276,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-coffee-950 border border-coffee-800">
+            <div className="p-6 sm:p-8 rounded-3xl bg-coffee-950 border border-coffee-800">
               <h3 className="font-serif text-xl font-bold text-cream mb-4">Active Live Orders</h3>
               <div className="space-y-3">
                 {orders.slice(0, 4).map((ord) => (
@@ -373,7 +387,7 @@ export default function AdminDashboard() {
                     {o.items.map((i: any) => (
                       <div key={i.id} className="flex justify-between">
                         <span>{i.quantity} × {i.name}</span>
-                        <span>₹{i.unitPrice * i.quantity}</span>
+                        <span>₹{(i.unitPrice || i.price) * i.quantity}</span>
                       </div>
                     ))}
                   </div>
@@ -404,7 +418,7 @@ export default function AdminDashboard() {
         {activeTab === 'menu' && (
           <div className="mt-8 space-y-8">
             <div className="p-6 rounded-3xl bg-coffee-950 border border-coffee-800">
-              <h3 className="font-serif text-xl font-bold text-cream mb-4">Add New Menu Item to Database</h3>
+              <h3 className="font-serif text-xl font-bold text-cream mb-4">Add New Menu Item (Demo Editor)</h3>
               <form onSubmit={handleCreateMenuItem} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input
                   type="text"

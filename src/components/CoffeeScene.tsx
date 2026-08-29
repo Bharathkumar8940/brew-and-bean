@@ -1,144 +1,137 @@
-import { useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Vector3 } from 'three';
+import { Float, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-interface CoffeeSceneProps {
-  scrollProgress: number; // 0 to 1
+// Procedural speckled texture for ceramic cup
+function createSpeckledCeramicTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  ctx.fillStyle = '#F4EBE1';
+  ctx.fillRect(0, 0, 512, 512);
+
+  ctx.fillStyle = '#46240E';
+  for (let i = 0; i < 700; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const size = Math.random() * 2 + 0.5;
+    ctx.globalAlpha = Math.random() * 0.4 + 0.1;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  return texture;
 }
 
-// 1. Ceramic Coffee Cup Component with Foam & Ripples
-function CoffeeCup({ scrollProgress }: { scrollProgress: number }) {
-  // Fill level: begins rising around 0.25 up to 0.75
-  const fillFactor = Math.min(Math.max((scrollProgress - 0.25) / 0.50, 0), 1);
-  const liquidY = -0.35 + fillFactor * 0.70;
-
-  const rippleRef = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (rippleRef.current && fillFactor > 0 && fillFactor < 1) {
-      const time = clock.getElapsedTime() * 8;
-      const scale = 0.95 + Math.sin(time) * 0.05;
-      rippleRef.current.scale.set(scale, 1, scale);
+function CoffeeCup() {
+  const texture = useMemo(() => {
+    try {
+      return createSpeckledCeramicTexture();
+    } catch (e) {
+      return null;
     }
-  });
+  }, []);
 
   return (
-    <group position={[0, -0.6, 0]}>
-      {/* Rustic Wooden Table Top */}
-      <mesh position={[0, -0.85, 0]} receiveShadow>
-        <boxGeometry args={[14, 0.4, 10]} />
+    <group position={[0, -0.4, 0]}>
+      {/* Outer Ceramic Cup Wall */}
+      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[1.2, 0.9, 1.4, 64, 1, true]} />
         <meshStandardMaterial
-          color="#3A1E0E"
-          roughness={0.65}
-          metalness={0.1}
+          map={texture || undefined}
+          color="#F7EFE5"
+          roughness={0.25}
+          metalness={0.05}
+          side={THREE.DoubleSide}
         />
       </mesh>
-      
-      {/* Table Rim Accent */}
-      <mesh position={[0, -1.06, 0]}>
-        <boxGeometry args={[14.2, 0.05, 10.2]} />
-        <meshStandardMaterial color="#211006" roughness={0.8} />
+
+      {/* Cup Base Floor */}
+      <mesh position={[0, 0.05, 0]} receiveShadow>
+        <cylinderGeometry args={[0.9, 0.85, 0.1, 64]} />
+        <meshStandardMaterial
+          map={texture || undefined}
+          color="#F7EFE5"
+          roughness={0.3}
+        />
       </mesh>
 
-      {/* Speckled Ceramic Café Cup */}
-      <group position={[0, 0, 0]}>
-        {/* Outer Shell */}
-        <mesh castShadow receiveShadow>
-          <cylinderGeometry args={[1.05, 0.75, 1.4, 64]} />
-          <meshStandardMaterial
-            color="#FAF5EE"
-            roughness={0.15}
-            metalness={0.05}
-          />
-        </mesh>
-
-        {/* Inner Hollow Cavity */}
-        <mesh position={[0, 0.08, 0]}>
-          <cylinderGeometry args={[0.96, 0.68, 1.3, 64]} />
-          <meshStandardMaterial
-            color="#F3ECE0"
-            roughness={0.2}
-            side={THREE.BackSide}
-          />
-        </mesh>
-
-        {/* Cup Handle */}
-        <mesh position={[1.15, 0, 0]} rotation={[0, 0, -Math.PI / 6]}>
-          <torusGeometry args={[0.42, 0.12, 24, 48, Math.PI * 1.2]} />
-          <meshStandardMaterial
-            color="#FAF5EE"
-            roughness={0.15}
-            metalness={0.05}
-          />
-        </mesh>
-
-        {/* Saucer Plate */}
-        <mesh position={[0, -0.7, 0]} receiveShadow castShadow>
-          <cylinderGeometry args={[1.6, 1.1, 0.12, 64]} />
-          <meshStandardMaterial
-            color="#F4ECE1"
-            roughness={0.18}
-            metalness={0.05}
-          />
-        </mesh>
-      </group>
-
-      {/* Creamy Milk Coffee & Foam */}
-      {fillFactor > 0 && (
-        <group position={[0, liquidY, 0]}>
-          {/* Main Surface */}
-          <mesh ref={rippleRef} position={[0, 0, 0]} receiveShadow>
-            <cylinderGeometry args={[0.70 + fillFactor * 0.22, 0.65, 0.04, 64]} />
-            <meshStandardMaterial
-              color="#542B12"
-              roughness={0.12}
-              metalness={0.15}
-            />
-          </mesh>
-
-          {/* Golden Foam Layer */}
-          <mesh position={[0, 0.01, 0]}>
-            <ringGeometry args={[0.35, 0.72 + fillFactor * 0.20, 32]} />
-            <meshBasicMaterial color="#C67C38" opacity={0.75} transparent />
-          </mesh>
-        </group>
-      )}
+      {/* Cup Handle */}
+      <mesh position={[1.25, 0.7, 0]} rotation={[0, 0, -Math.PI / 12]} castShadow>
+        <torusGeometry args={[0.45, 0.1, 16, 32, Math.PI * 1.2]} />
+        <meshStandardMaterial
+          map={texture || undefined}
+          color="#F7EFE5"
+          roughness={0.25}
+        />
+      </mesh>
     </group>
   );
 }
 
-// 2. Coffee Stream Pouring Component
-function CoffeeStream({ scrollProgress }: { scrollProgress: number }) {
-  const streamRef = useRef<THREE.Mesh>(null);
+function CoffeeLiquid({ level }: { level: number }) {
+  const surfaceRef = useRef<THREE.Mesh>(null);
 
-  const streamFactor = useMemo(() => {
-    if (scrollProgress < 0.25) return 0;
-    if (scrollProgress > 0.85) return Math.max(0, 1 - (scrollProgress - 0.85) / 0.1);
-    return Math.min((scrollProgress - 0.25) / 0.20, 1);
-  }, [scrollProgress]);
-
-  const fillFactor = Math.min(Math.max((scrollProgress - 0.25) / 0.50, 0), 1);
-  const targetY = -0.95 + fillFactor * 0.70;
-
-  useFrame(({ clock }) => {
-    if (streamRef.current) {
-      const time = clock.getElapsedTime() * 4;
-      streamRef.current.position.x = Math.sin(time) * 0.02;
-      streamRef.current.position.z = Math.cos(time * 0.8) * 0.02;
+  useFrame((state) => {
+    if (surfaceRef.current) {
+      const time = state.clock.getElapsedTime();
+      surfaceRef.current.position.y = (Math.sin(time * 2) * 0.015) + (level * 1.15) + 0.1;
+      surfaceRef.current.rotation.z = Math.sin(time * 1.5) * 0.01;
     }
   });
 
-  if (streamFactor <= 0.01) return null;
+  if (level <= 0.02) return null;
 
-  const topY = 4.5;
-  const height = topY - targetY;
-  const posY = topY - height / 2;
+  const currentRadius = 0.88 + level * 0.28;
 
   return (
-    <mesh ref={streamRef} position={[0, posY, 0]}>
-      <cylinderGeometry args={[0.08 * streamFactor, 0.06 * streamFactor, height, 32]} />
+    <group>
+      <mesh position={[0, (level * 1.15) / 2 + 0.1, 0]}>
+        <cylinderGeometry args={[currentRadius, 0.88, Math.max(level * 1.15, 0.01), 48]} />
+        <meshStandardMaterial
+          color="#3D1E0B"
+          roughness={0.1}
+          metalness={0.1}
+        />
+      </mesh>
+
+      <mesh ref={surfaceRef} position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[currentRadius - 0.02, 48]} />
+        <meshStandardMaterial
+          color={level > 0.6 ? '#C67C38' : '#46240E'}
+          roughness={0.2}
+          metalness={0.05}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function PouringStream({ progress }: { progress: number }) {
+  const streamRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (streamRef.current) {
+      const time = state.clock.getElapsedTime();
+      streamRef.current.rotation.y = time * 3;
+    }
+  });
+
+  if (progress < 0.2 || progress > 0.88) return null;
+
+  return (
+    <mesh ref={streamRef} position={[0, 2.2, 0]}>
+      <cylinderGeometry args={[0.07, 0.09, 3.5, 16]} />
       <meshStandardMaterial
-        color="#7C4623"
+        color="#5C3114"
         roughness={0.1}
         metalness={0.2}
         transparent
@@ -148,161 +141,186 @@ function CoffeeStream({ scrollProgress }: { scrollProgress: number }) {
   );
 }
 
-// 3. Splash Droplets & Surface Hit Effect
-function SplashEffect({ scrollProgress }: { scrollProgress: number }) {
-  const splashActive = scrollProgress >= 0.70 && scrollProgress <= 0.88;
-  const particlesRef = useRef<THREE.Points>(null);
-
-  const particleCount = 45;
-  const positions = useMemo(() => {
-    const pos = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 0.4 + Math.random() * 0.85;
-      pos[i * 3] = Math.cos(angle) * radius;
-      pos[i * 3 + 1] = (Math.random() - 0.2) * 0.4;
-      pos[i * 3 + 2] = Math.sin(angle) * radius;
-    }
-    return pos;
-  }, []);
-
-  useFrame(({ clock }) => {
-    if (particlesRef.current && splashActive) {
-      const time = clock.getElapsedTime() * 6;
-      const posArray = particlesRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < particleCount; i++) {
-        posArray[i * 3 + 1] = Math.abs(Math.sin(time + i)) * 0.38;
-      }
-      particlesRef.current.geometry.attributes.position.needsUpdate = true;
-    }
-  });
-
-  if (!splashActive) return null;
-
-  const fillFactor = Math.min(Math.max((scrollProgress - 0.25) / 0.50, 0), 1);
-  const liquidY = -0.95 + fillFactor * 0.70;
-
+function WoodenTable() {
   return (
-    <group position={[0, liquidY, 0]}>
-      <points ref={particlesRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[positions, 3]}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.06}
-          color="#653B1A"
-          transparent
-          opacity={0.85}
-        />
-      </points>
-    </group>
-  );
-}
-
-// 4. Steam Rising Particles
-function SteamEffect({ scrollProgress }: { scrollProgress: number }) {
-  const steamRef = useRef<THREE.Points>(null);
-  const count = 30;
-
-  const [positions, offsets] = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const offs = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 0.6;
-      pos[i * 3 + 1] = Math.random() * 1.5;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 0.6;
-      offs[i] = Math.random() * Math.PI * 2;
-    }
-    return [pos, offs];
-  }, []);
-
-  useFrame(({ clock }) => {
-    if (steamRef.current && scrollProgress > 0.70) {
-      const time = clock.getElapsedTime() * 0.8;
-      const posArray = steamRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < count; i++) {
-        posArray[i * 3 + 1] += 0.008;
-        posArray[i * 3] += Math.sin(time + offsets[i]) * 0.003;
-        if (posArray[i * 3 + 1] > 1.8) {
-          posArray[i * 3 + 1] = 0;
-          posArray[i * 3] = (Math.random() - 0.5) * 0.6;
-        }
-      }
-      steamRef.current.geometry.attributes.position.needsUpdate = true;
-    }
-  });
-
-  if (scrollProgress <= 0.70) return null;
-
-  return (
-    <group position={[0, 0.1, 0]}>
-      <points ref={steamRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[positions, 3]}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.18}
-          color="#FAF5EE"
-          transparent
-          opacity={0.25}
-          depthWrite={false}
-        />
-      </points>
-    </group>
-  );
-}
-
-// 5. Camera & Warm Café Lighting Controller
-function SceneController({ scrollProgress }: { scrollProgress: number }) {
-  useFrame(({ camera }) => {
-    const angle = scrollProgress * Math.PI * 0.85;
-    const radius = 4.8 - Math.sin(scrollProgress * Math.PI) * 0.8;
-    const height = 1.8 - scrollProgress * 1.2;
-
-    const targetX = Math.sin(angle) * radius;
-    const targetZ = Math.cos(angle) * radius;
-    const targetY = Math.max(-0.5, height);
-
-    camera.position.x += (targetX - camera.position.x) * 0.08;
-    camera.position.y += (targetY - camera.position.y) * 0.08;
-    camera.position.z += (targetZ - camera.position.z) * 0.08;
-    camera.lookAt(new Vector3(0, -0.4 + scrollProgress * 0.2, 0));
-  });
-
-  return (
-    <>
-      <ambientLight intensity={0.65} color="#FFE8D6" />
-      <directionalLight
-        position={[4, 6, 3]}
-        intensity={1.8}
-        color="#FFAE68"
-        castShadow
+    <mesh position={[0, -0.45, 0]} receiveShadow>
+      <cylinderGeometry args={[4, 4.2, 0.2, 64]} />
+      <meshStandardMaterial
+        color="#2C1305"
+        roughness={0.4}
+        metalness={0.1}
       />
-      <directionalLight position={[-4, 3, -3]} intensity={0.5} color="#8DA9C4" />
-      <pointLight position={[0, 2.5, 1]} intensity={0.8} color="#FF9F43" distance={6} />
-    </>
+    </mesh>
   );
 }
 
-export default function CoffeeScene({ scrollProgress }: CoffeeSceneProps) {
+function FallbackCoffeeGraphic() {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-espresso text-cream text-center p-6">
+      <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-coffee-900 via-caramel to-amber-300 flex items-center justify-center shadow-glow mb-4">
+        <span className="text-5xl sm:text-6xl">☕</span>
+      </div>
+      <h3 className="font-serif text-xl sm:text-2xl font-bold text-caramel">Brew & Bean Café</h3>
+      <p className="text-xs text-coffee-300 max-w-xs mt-2">Artisanal Coffee & Micro-Roasts</p>
+    </div>
+  );
+}
+
+interface FrameSequenceEngineProps {
+  scrollProgress: number;
+  frameFolderUrl?: string;
+  totalFrames?: number;
+}
+
+export default function CoffeeScene({
+  scrollProgress,
+  frameFolderUrl,
+  totalFrames = 60,
+}: FrameSequenceEngineProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [framesLoaded, setFramesLoaded] = useState(false);
+  const [useFrameSequence, setUseFrameSequence] = useState(false);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+
+  // Check reduced motion accessibility setting
+  const prefersReducedMotion = useMemo(() => {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // Frame sequence preloader
+  useEffect(() => {
+    if (!frameFolderUrl) return;
+
+    let isCancelled = false;
+    const loadedImages: HTMLImageElement[] = [];
+    let loadCount = 0;
+
+    for (let i = 1; i <= totalFrames; i++) {
+      const img = new Image();
+      const frameNum = String(i).padStart(3, '0');
+      img.src = `${frameFolderUrl}/frame_${frameNum}.jpg`;
+      img.onload = () => {
+        if (isCancelled) return;
+        loadCount++;
+        if (loadCount === totalFrames) {
+          imagesRef.current = loadedImages;
+          setFramesLoaded(true);
+          setUseFrameSequence(true);
+        }
+      };
+      img.onerror = () => {
+        // If image sequence missing, fallback smoothly to WebGL / 3D Canvas
+        if (!isCancelled) setUseFrameSequence(false);
+      };
+      loadedImages.push(img);
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [frameFolderUrl, totalFrames]);
+
+  // Render frame onto HTML Canvas
+  useEffect(() => {
+    if (!useFrameSequence || !framesLoaded || !canvasRef.current || imagesRef.current.length === 0) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const targetIndex = Math.min(
+      Math.floor(scrollProgress * (imagesRef.current.length - 1)),
+      imagesRef.current.length - 1
+    );
+
+    const img = imagesRef.current[targetIndex];
+    if (!img || !img.complete) return;
+
+    // Responsive Canvas aspect-fit rendering
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth * dpr;
+    const height = canvas.clientHeight * dpr;
+
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Object-fit: cover calculation
+    const imgRatio = img.width / img.height;
+    const canvasRatio = width / height;
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasRatio > imgRatio) {
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
+    } else {
+      drawWidth = height * imgRatio;
+      offsetX = (width - drawWidth) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  }, [scrollProgress, useFrameSequence, framesLoaded]);
+
+  const liquidLevel = useMemo(() => {
+    if (scrollProgress < 0.25) return 0;
+    return Math.min((scrollProgress - 0.25) / 0.5, 1);
+  }, [scrollProgress]);
+
+  // If user enabled reduced motion or frame sequence active
+  if (prefersReducedMotion) {
+    return <FallbackCoffeeGraphic />;
+  }
+
+  if (useFrameSequence && framesLoaded) {
+    return (
+      <div className="relative w-full h-full bg-espresso">
+        <canvas ref={canvasRef} className="w-full h-full object-cover block" />
+      </div>
+    );
+  }
+
+  // WebGL 3D Canvas
+  return (
+    <div className="relative w-full h-full bg-espresso">
       <Canvas
         shadows
-        camera={{ position: [0, 1.8, 4.8], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        camera={{ position: [0, 2.5, 4.5], fov: 45 }}
+        fallback={<FallbackCoffeeGraphic />}
+        gl={{ preserveDrawingBuffer: true, antialias: true }}
       >
-        <SceneController scrollProgress={scrollProgress} />
-        <CoffeeCup scrollProgress={scrollProgress} />
-        <CoffeeStream scrollProgress={scrollProgress} />
-        <SplashEffect scrollProgress={scrollProgress} />
-        <SteamEffect scrollProgress={scrollProgress} />
+        <ambientLight intensity={0.9} />
+        <directionalLight
+          position={[5, 8, 5]}
+          intensity={1.8}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          color="#FFF5EA"
+        />
+        <pointLight position={[-4, 3, -2]} intensity={1.2} color="#C67C38" />
+        <pointLight position={[0, 1, 2]} intensity={0.6} color="#FFE8D6" />
+
+        <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.2}>
+          <group position={[0, 0, 0]}>
+            <WoodenTable />
+            <CoffeeCup />
+            <CoffeeLiquid level={liquidLevel} />
+            <PouringStream progress={scrollProgress} />
+          </group>
+        </Float>
+
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          maxPolarAngle={Math.PI / 2.1}
+          minPolarAngle={Math.PI / 4}
+        />
       </Canvas>
     </div>
   );

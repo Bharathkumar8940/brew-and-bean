@@ -1,11 +1,10 @@
-import { Coffee, MessageCircle, Heart } from 'lucide-react';
+import { Coffee, MessageCircle, Heart, Sparkles } from 'lucide-react';
+import { defaultCafeConfig } from '../cafeConfig';
 
 export default function Footer() {
-  const whatsappNumber = "918639098389";
-
   return (
     <footer className="bg-espresso border-t border-coffee-900/80 pt-16 pb-12 text-coffee-300">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-coffee-900">
           
@@ -15,58 +14,68 @@ export default function Footer() {
                 <Coffee className="w-5 h-5 text-cream" />
               </div>
               <span className="font-serif text-xl font-bold tracking-wider text-cream">
-                BREW & BEAN
+                {defaultCafeConfig.brand.name.toUpperCase()}
               </span>
             </a>
             <p className="text-xs text-coffee-400 mt-4 leading-relaxed">
-              Craft coffee shop serving single-origin roasts, handmade pasta, and fresh desserts.
+              Craft coffee showcase template featuring artisanal roasts, handmade pasta, and fresh desserts.
             </p>
+            {defaultCafeConfig.isDemo && (
+              <div className="mt-4 p-2.5 rounded-xl bg-coffee-950/90 border border-coffee-800/80 text-[11px] text-caramel font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>Demo Website — Concept Project</span>
+              </div>
+            )}
           </div>
 
           <div>
             <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Quick Navigation</h4>
-            <ul className="mt-4 space-y-2.5 text-xs">
+            <ul className="mt-4 space-y-2 text-xs">
               <li><a href="#hero" className="hover:text-caramel transition-colors">Hero Experience</a></li>
               <li><a href="#story" className="hover:text-caramel transition-colors">Our Story</a></li>
-              <li><a href="#signature-coffee" className="hover:text-caramel transition-colors">Signature Coffee</a></li>
-              <li><a href="#food-menu" className="hover:text-caramel transition-colors">Food Menu</a></li>
-              <li><a href="#experience" className="hover:text-caramel transition-colors">Café Experience</a></li>
+              <li><a href="#food-menu" className="hover:text-caramel transition-colors">Artisanal Menu</a></li>
+              <li><a href="#reservations-section" className="hover:text-caramel transition-colors">Table Reservations</a></li>
+              <li><a href="#experience" className="hover:text-caramel transition-colors">Café Atmosphere</a></li>
+              <li><a href="#events-section" className="hover:text-caramel transition-colors">Private Events</a></li>
+              <li><a href="./?page=admin" className="hover:text-caramel transition-colors">Staff Portal (Demo)</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Visit Us</h4>
+            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Sample Location</h4>
             <p className="text-xs text-coffee-400 mt-4 leading-relaxed">
-              Plot 42, Heritage Boulevard, Indiranagar, Bengaluru
+              {defaultCafeConfig.contact.address}
             </p>
             <p className="text-xs text-coffee-400 mt-2">
-              Hours: 9:00 AM – 10:30 PM
+              Hours: {defaultCafeConfig.contact.openingHours.weekdays}
             </p>
             <p className="text-xs text-caramel mt-2 font-medium">
-              +91 86390 98389
+              {defaultCafeConfig.contact.phone}
             </p>
           </div>
 
           <div>
-            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Follow Our Journal</h4>
+            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Direct WhatsApp Inquiry</h4>
             <div className="flex items-center gap-3 mt-4">
               <a
-                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Brew & Bean Café, I have a query about your menu.")}`}
+                href={`https://wa.me/${defaultCafeConfig.contact.whatsappNumber}?text=${encodeURIComponent("Hi Brew & Bean Café, I have an inquiry about your services.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-coffee-900 border border-coffee-800 flex items-center justify-center hover:bg-caramel hover:text-white transition-colors"
+                title="WhatsApp Direct Contact"
               >
-                <MessageCircle className="w-4 h-4 text-green-500" />
+                <MessageCircle className="w-4 h-4 text-emerald-400" />
               </a>
+              <span className="text-xs text-coffee-400">{defaultCafeConfig.contact.phone}</span>
             </div>
           </div>
 
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-coffee-400">
-          <p>© {new Date().getFullYear()} Brew & Bean Café. All rights reserved.</p>
-          <p className="flex items-center gap-1 mt-2 sm:mt-0">
-            Brewed with <Heart className="w-3.5 h-3.5 text-caramel fill-current" /> in Bengaluru
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-coffee-400 gap-2">
+          <p>© {new Date().getFullYear()} {defaultCafeConfig.brand.name} Café. Portfolio Concept Project.</p>
+          <p className="flex items-center gap-1">
+            Crafted with <Heart className="w-3.5 h-3.5 text-caramel fill-current" /> for Premium Café Websites
           </p>
         </div>
 
