@@ -49,13 +49,6 @@ export interface CafeConfig {
     description: string;
     iconName: string;
   }>;
-  sampleTestimonials: Array<{
-    id: string;
-    name: string;
-    role: string;
-    comment: string;
-    rating: number;
-  }>;
 }
 
 export const defaultCafeConfig: CafeConfig = {
@@ -76,7 +69,7 @@ export const defaultCafeConfig: CafeConfig = {
     storyParagraph2: "Whether you need a quiet morning corner to work, an afternoon espresso break, or a warm venue to celebrate with friends, our space is thoughtfully designed to be your daily sanctuary."
   },
   contact: {
-    address: "Sample Address: 42 Heritage Boulevard, Indiranagar, Bengaluru, KA 560038",
+    address: "Plot 42, Heritage Boulevard, Indiranagar, Bengaluru, KA 560038",
     phone: "+91 86390 98389",
     whatsappNumber: "918639098389",
     email: "hello@brewandbean-demo.com",
@@ -346,29 +339,6 @@ export const defaultCafeConfig: CafeConfig = {
       title: "Private Events & Gatherings",
       description: "Dedicated spaces available for birthday celebrations, team workshops, book clubs, and acoustic sessions.",
       iconName: "Calendar"
-    }
-  ],
-  sampleTestimonials: [
-    {
-      id: "st1",
-      name: "Sample Guest Review",
-      role: "Coffee Enthusiast (Demo)",
-      comment: "The Velvet Cappuccino paired with their warm butter croissant is pure perfection. Beautiful ambient seating!",
-      rating: 5
-    },
-    {
-      id: "st2",
-      name: "Sample Guest Review",
-      role: "Remote Creative (Demo)",
-      comment: "My favorite spot for afternoon focus sessions. Great lighting, reliable Wi-Fi, and handcrafted beverages.",
-      rating: 5
-    },
-    {
-      id: "st3",
-      name: "Sample Guest Review",
-      role: "Local Foodie (Demo)",
-      comment: "Brew & Bean sets the standard for micro-roasting in the area. Excellent attention to flavor profiles.",
-      rating: 5
     }
   ]
 };
