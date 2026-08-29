@@ -1,242 +1,182 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-
-// Procedural speckled texture for ceramic cup
-function createSpeckledCeramicTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-
-  ctx.fillStyle = '#F4EBE1';
-  ctx.fillRect(0, 0, 512, 512);
-
-  ctx.fillStyle = '#46240E';
-  for (let i = 0; i < 700; i++) {
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    const size = Math.random() * 2 + 0.5;
-    ctx.globalAlpha = Math.random() * 0.4 + 0.1;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  return texture;
-}
-
-function CoffeeCup() {
-  const texture = useMemo(() => {
-    try {
-      return createSpeckledCeramicTexture();
-    } catch (e) {
-      return null;
-    }
-  }, []);
-
-  return (
-    <group position={[0, -0.4, 0]}>
-      {/* Outer Ceramic Cup Wall */}
-      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[1.2, 0.9, 1.4, 64, 1, true]} />
-        <meshStandardMaterial
-          map={texture || undefined}
-          color="#F7EFE5"
-          roughness={0.25}
-          metalness={0.05}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Cup Base Floor */}
-      <mesh position={[0, 0.05, 0]} receiveShadow>
-        <cylinderGeometry args={[0.9, 0.85, 0.1, 64]} />
-        <meshStandardMaterial
-          map={texture || undefined}
-          color="#F7EFE5"
-          roughness={0.3}
-        />
-      </mesh>
-
-      {/* Cup Handle */}
-      <mesh position={[1.25, 0.7, 0]} rotation={[0, 0, -Math.PI / 12]} castShadow>
-        <torusGeometry args={[0.45, 0.1, 16, 32, Math.PI * 1.2]} />
-        <meshStandardMaterial
-          map={texture || undefined}
-          color="#F7EFE5"
-          roughness={0.25}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function CoffeeLiquid({ level }: { level: number }) {
-  const surfaceRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (surfaceRef.current) {
-      const time = state.clock.getElapsedTime();
-      surfaceRef.current.position.y = (Math.sin(time * 2) * 0.015) + (level * 1.15) + 0.1;
-      surfaceRef.current.rotation.z = Math.sin(time * 1.5) * 0.01;
-    }
-  });
-
-  if (level <= 0.02) return null;
-
-  const currentRadius = 0.88 + level * 0.28;
-
-  return (
-    <group>
-      <mesh position={[0, (level * 1.15) / 2 + 0.1, 0]}>
-        <cylinderGeometry args={[currentRadius, 0.88, Math.max(level * 1.15, 0.01), 48]} />
-        <meshStandardMaterial
-          color="#3D1E0B"
-          roughness={0.1}
-          metalness={0.1}
-        />
-      </mesh>
-
-      <mesh ref={surfaceRef} position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[currentRadius - 0.02, 48]} />
-        <meshStandardMaterial
-          color={level > 0.6 ? '#C67C38' : '#46240E'}
-          roughness={0.2}
-          metalness={0.05}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function PouringStream({ progress }: { progress: number }) {
-  const streamRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (streamRef.current) {
-      const time = state.clock.getElapsedTime();
-      streamRef.current.rotation.y = time * 3;
-    }
-  });
-
-  if (progress < 0.2 || progress > 0.88) return null;
-
-  return (
-    <mesh ref={streamRef} position={[0, 2.2, 0]}>
-      <cylinderGeometry args={[0.07, 0.09, 3.5, 16]} />
-      <meshStandardMaterial
-        color="#5C3114"
-        roughness={0.1}
-        metalness={0.2}
-        transparent
-        opacity={0.92}
-      />
-    </mesh>
-  );
-}
-
-function WoodenTable() {
-  return (
-    <mesh position={[0, -0.45, 0]} receiveShadow>
-      <cylinderGeometry args={[4, 4.2, 0.2, 64]} />
-      <meshStandardMaterial
-        color="#2C1305"
-        roughness={0.4}
-        metalness={0.1}
-      />
-    </mesh>
-  );
-}
-
-function FallbackCoffeeGraphic() {
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-espresso text-cream text-center p-6">
-      <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-coffee-900 via-caramel to-amber-300 flex items-center justify-center shadow-glow mb-4">
-        <span className="text-5xl sm:text-6xl">☕</span>
-      </div>
-      <h3 className="font-serif text-xl sm:text-2xl font-bold text-caramel">Brew & Bean Café</h3>
-      <p className="text-xs text-coffee-300 max-w-xs mt-2">Artisanal Coffee & Micro-Roasts</p>
-    </div>
-  );
-}
+import { useEffect, useRef, useMemo } from 'react';
 
 interface FrameSequenceEngineProps {
   scrollProgress: number;
-  frameFolderUrl?: string;
   totalFrames?: number;
+  frameFolderUrl?: string;
 }
 
 export default function CoffeeScene({
   scrollProgress,
-  frameFolderUrl,
   totalFrames = 60,
 }: FrameSequenceEngineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [framesLoaded, setFramesLoaded] = useState(false);
-  const [useFrameSequence, setUseFrameSequence] = useState(false);
   const imagesRef = useRef<HTMLImageElement[]>([]);
+  const loadedCountRef = useRef(0);
 
-  // Check reduced motion accessibility setting
-  const prefersReducedMotion = useMemo(() => {
-    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }, []);
+  // Generate SVG Frame Data URIs dynamically so frame sequence works out-of-the-box
+  const generatedFrames = useMemo(() => {
+    const frames: string[] = [];
+    const width = 1200;
+    const height = 800;
 
-  // Frame sequence preloader
-  useEffect(() => {
-    if (!frameFolderUrl) return;
+    for (let i = 0; i < totalFrames; i++) {
+      const progress = i / (totalFrames - 1);
+      
+      const cupY = 520;
+      const cupX = 600;
+      const streamYEnd = Math.min(progress * 2 * 500, 500);
+      const isPouring = progress >= 0.15 && progress <= 0.85;
+      const liquidFillHeight = Math.max(0, Math.min((progress - 0.2) * 1.3, 1)) * 120;
+      const steamOpacity = Math.max(0, (progress - 0.6) * 2.2);
 
-    let isCancelled = false;
-    const loadedImages: HTMLImageElement[] = [];
-    let loadCount = 0;
+      const svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <defs>
+            <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#3D1E0B" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="#1A0B05" stop-opacity="1" />
+            </radialGradient>
 
-    for (let i = 1; i <= totalFrames; i++) {
-      const img = new Image();
-      const frameNum = String(i).padStart(3, '0');
-      img.src = `${frameFolderUrl}/frame_${frameNum}.jpg`;
-      img.onload = () => {
-        if (isCancelled) return;
-        loadCount++;
-        if (loadCount === totalFrames) {
-          imagesRef.current = loadedImages;
-          setFramesLoaded(true);
-          setUseFrameSequence(true);
-        }
-      };
-      img.onerror = () => {
-        // If image sequence missing, fallback smoothly to WebGL / 3D Canvas
-        if (!isCancelled) setUseFrameSequence(false);
-      };
-      loadedImages.push(img);
+            <linearGradient id="streamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#653B1A" />
+              <stop offset="50%" stop-color="#C67C38" />
+              <stop offset="100%" stop-color="#46240E" />
+            </linearGradient>
+
+            <linearGradient id="tableGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#3B1E0B" />
+              <stop offset="100%" stop-color="#150803" />
+            </linearGradient>
+
+            <linearGradient id="cremaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#D5B79A" />
+              <stop offset="50%" stop-color="#C67C38" />
+              <stop offset="100%" stop-color="#653B1A" />
+            </linearGradient>
+          </defs>
+
+          <!-- Dark Espresso Background -->
+          <rect width="100%" height="100%" fill="url(#bgGlow)" />
+
+          <!-- Wooden Table Base -->
+          <ellipse cx="600" cy="620" rx="460" ry="140" fill="url(#tableGrad)" stroke="#653B1A" stroke-width="3" />
+          <ellipse cx="600" cy="620" rx="450" ry="130" fill="none" stroke="#C67C38" stroke-opacity="0.15" stroke-width="2" />
+
+          <!-- Steam Particles (Phase 3: 60%-100%) -->
+          ${
+            steamOpacity > 0
+              ? `
+            <g opacity="${steamOpacity * 0.7}">
+              <path d="M 540 ${cupY - 120} Q 520 ${cupY - 220} 560 ${cupY - 320}" fill="none" stroke="#F7EFE5" stroke-width="12" stroke-linecap="round" opacity="0.25" />
+              <path d="M 600 ${cupY - 130} Q 630 ${cupY - 240} 590 ${cupY - 350}" fill="none" stroke="#FFE8D6" stroke-width="16" stroke-linecap="round" opacity="0.3" />
+              <path d="M 660 ${cupY - 110} Q 680 ${cupY - 210} 640 ${cupY - 300}" fill="none" stroke="#F7EFE5" stroke-width="10" stroke-linecap="round" opacity="0.2" />
+            </g>
+          `
+              : ''
+          }
+
+          <!-- Pouring Coffee Stream (Phase 1 & 2) -->
+          ${
+            isPouring
+              ? `
+            <path d="M 600 0 L 600 ${streamYEnd}" fill="none" stroke="url(#streamGrad)" stroke-width="${14 + Math.sin(progress * 20) * 3}" stroke-linecap="round" />
+            <path d="M 598 0 L 598 ${streamYEnd}" fill="none" stroke="#FFE8D6" stroke-width="3" opacity="0.6" />
+          `
+              : ''
+          }
+
+          <!-- Splash Droplets at Surface Hit (Phase 2: 45%-75%) -->
+          ${
+            progress > 0.4 && progress < 0.8
+              ? `
+            <circle cx="560" cy="${cupY - liquidFillHeight - 15}" r="6" fill="#C67C38" opacity="0.8" />
+            <circle cx="645" cy="${cupY - liquidFillHeight - 20}" r="8" fill="#653B1A" opacity="0.9" />
+            <circle cx="580" cy="${cupY - liquidFillHeight - 25}" r="5" fill="#FFE8D6" opacity="0.8" />
+            <circle cx="625" cy="${cupY - liquidFillHeight - 30}" r="4" fill="#C67C38" opacity="0.7" />
+          `
+              : ''
+          }
+
+          <!-- Ceramic Cup Back Rim -->
+          <ellipse cx="${cupX}" cy="${cupY - 80}" rx="140" ry="40" fill="#2C1305" stroke="#E6D3C1" stroke-width="8" />
+
+          <!-- Rising Liquid Layer Inside Cup -->
+          ${
+            liquidFillHeight > 0
+              ? `
+            <path d="M ${cupX - 130} ${cupY - 75} Q ${cupX} ${cupY - 30} ${cupX + 130} ${cupY - 75} L ${cupX + 130 - (liquidFillHeight * 0.1)} ${cupY - 75 - liquidFillHeight} Q ${cupX} ${cupY - 35 - liquidFillHeight} ${cupX - 130 + (liquidFillHeight * 0.1)} ${cupY - 75 - liquidFillHeight} Z" fill="#3D1E0B" />
+            <ellipse cx="${cupX}" cy="${cupY - 75 - liquidFillHeight}" rx="${132 - liquidFillHeight * 0.05}" ry="35" fill="url(#cremaGrad)" stroke="#FFE8D6" stroke-opacity="0.5" stroke-width="3" />
+          `
+              : ''
+          }
+
+          <!-- Outer Speckled Ceramic Cup Body -->
+          <path d="M ${cupX - 140} ${cupY - 80} C ${cupX - 150} ${cupY + 60}, ${cupX - 90} ${cupY + 120}, ${cupX} ${cupY + 120} C ${cupX + 90} ${cupY + 120}, ${cupX + 150} ${cupY + 60}, ${cupX + 140} ${cupY - 80} Z" fill="#F7EFE5" stroke="#D5B79A" stroke-width="6" />
+
+          <!-- Cup Base Shadow -->
+          <ellipse cx="${cupX}" cy="${cupY + 120}" rx="95" ry="25" fill="#1A0902" opacity="0.8" />
+
+          <!-- Cup Handle -->
+          <path d="M ${cupX + 135} ${cupY - 40} C ${cupX + 220} ${cupY - 30}, ${cupX + 210} ${cupY + 70}, ${cupX + 115} ${cupY + 80}" fill="none" stroke="#F7EFE5" stroke-width="22" stroke-linecap="round" />
+          <path d="M ${cupX + 135} ${cupY - 40} C ${cupX + 220} ${cupY - 30}, ${cupX + 210} ${cupY + 70}, ${cupX + 115} ${cupY + 80}" fill="none" stroke="#D5B79A" stroke-width="6" stroke-linecap="round" />
+
+          <!-- Decorative Cup Texture Dots -->
+          <circle cx="${cupX - 40}" cy="${cupY + 10}" r="3" fill="#46240E" opacity="0.3" />
+          <circle cx="${cupX + 50}" cy="${cupY + 30}" r="2" fill="#46240E" opacity="0.4" />
+          <circle cx="${cupX - 20}" cy="${cupY + 60}" r="4" fill="#46240E" opacity="0.25" />
+          <circle cx="${cupX + 30}" cy="${cupY - 10}" r="3" fill="#46240E" opacity="0.3" />
+        </svg>
+      `;
+
+      frames.push(`data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`);
     }
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [frameFolderUrl, totalFrames]);
+    return frames;
+  }, [totalFrames]);
 
-  // Render frame onto HTML Canvas
+  // Preload frame images
   useEffect(() => {
-    if (!useFrameSequence || !framesLoaded || !canvasRef.current || imagesRef.current.length === 0) return;
+    let isMounted = true;
+    const images: HTMLImageElement[] = [];
+    loadedCountRef.current = 0;
 
+    generatedFrames.forEach((src, idx) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        if (!isMounted) return;
+        loadedCountRef.current++;
+        if (canvasRef.current) {
+          drawFrame(scrollProgress);
+        }
+      };
+      images[idx] = img;
+    });
+
+    imagesRef.current = images;
+
+    return () => {
+      isMounted = false;
+    };
+  }, [generatedFrames]);
+
+  // Draw current frame onto HTML Canvas
+  const drawFrame = (progress: number) => {
     const canvas = canvasRef.current;
+    if (!canvas || imagesRef.current.length === 0) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const targetIndex = Math.min(
-      Math.floor(scrollProgress * (imagesRef.current.length - 1)),
+    const frameIndex = Math.min(
+      Math.floor(progress * (imagesRef.current.length - 1)),
       imagesRef.current.length - 1
     );
 
-    const img = imagesRef.current[targetIndex];
+    const img = imagesRef.current[frameIndex];
     if (!img || !img.complete) return;
 
-    // Responsive Canvas aspect-fit rendering
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.clientWidth * dpr;
     const height = canvas.clientHeight * dpr;
@@ -248,7 +188,6 @@ export default function CoffeeScene({
 
     ctx.clearRect(0, 0, width, height);
 
-    // Object-fit: cover calculation
     const imgRatio = img.width / img.height;
     const canvasRatio = width / height;
     let drawWidth = width;
@@ -265,63 +204,24 @@ export default function CoffeeScene({
     }
 
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-  }, [scrollProgress, useFrameSequence, framesLoaded]);
+  };
 
-  const liquidLevel = useMemo(() => {
-    if (scrollProgress < 0.25) return 0;
-    return Math.min((scrollProgress - 0.25) / 0.5, 1);
+  useEffect(() => {
+    let animationFrameId: number;
+    const render = () => {
+      drawFrame(scrollProgress);
+    };
+    animationFrameId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [scrollProgress]);
 
-  // If user enabled reduced motion or frame sequence active
-  if (prefersReducedMotion) {
-    return <FallbackCoffeeGraphic />;
-  }
-
-  if (useFrameSequence && framesLoaded) {
-    return (
-      <div className="relative w-full h-full bg-espresso">
-        <canvas ref={canvasRef} className="w-full h-full object-cover block" />
-      </div>
-    );
-  }
-
-  // WebGL 3D Canvas
   return (
     <div className="relative w-full h-full bg-espresso">
-      <Canvas
-        shadows
-        camera={{ position: [0, 2.5, 4.5], fov: 45 }}
-        fallback={<FallbackCoffeeGraphic />}
-        gl={{ preserveDrawingBuffer: true, antialias: true }}
-      >
-        <ambientLight intensity={0.9} />
-        <directionalLight
-          position={[5, 8, 5]}
-          intensity={1.8}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          color="#FFF5EA"
-        />
-        <pointLight position={[-4, 3, -2]} intensity={1.2} color="#C67C38" />
-        <pointLight position={[0, 1, 2]} intensity={0.6} color="#FFE8D6" />
-
-        <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.2}>
-          <group position={[0, 0, 0]}>
-            <WoodenTable />
-            <CoffeeCup />
-            <CoffeeLiquid level={liquidLevel} />
-            <PouringStream progress={scrollProgress} />
-          </group>
-        </Float>
-
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          maxPolarAngle={Math.PI / 2.1}
-          minPolarAngle={Math.PI / 4}
-        />
-      </Canvas>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full object-cover block"
+        style={{ width: '100%', height: '100%' }}
+      />
     </div>
   );
 }
