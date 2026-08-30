@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import videoUrl from '/Pouring_coffee_into_cup_202608261706.mp4?url';
 
 export default function CoffeeScene() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -70,7 +71,7 @@ export default function CoffeeScene() {
     <div className="relative w-full h-full bg-espresso overflow-hidden">
       <video
         ref={videoRef}
-        src="./Pouring_coffee_into_cup_202608261706.mp4"
+        src={videoUrl}
         autoPlay
         muted
         playsInline
