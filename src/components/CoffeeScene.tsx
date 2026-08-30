@@ -1,139 +1,81 @@
 import { useEffect, useRef } from 'react';
-import coffeeVideoUrl from '/Pouring_coffee_into_cup_202608261706.mp4?url';
 
-interface AutoPlayVideoProps {
-  videoSrc?: string;
-}
-
-export default function CoffeeScene({
-  videoSrc,
-}: AutoPlayVideoProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function CoffeeScene() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const srcToUse = videoSrc || coffeeVideoUrl;
-
   useEffect(() => {
-    const canvas = canvasRef.current;
     const video = videoRef.current;
-    if (!canvas || !video) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!video) return;
 
     let isMounted = true;
-    let animId: number;
     let forward = true;
     let duration = 0;
-    let currentTime = 0;
+    let intervalId: any;
 
-    // Preload video into memory
-    video.src = srcToUse;
-    video.muted = true;
-    video.playsInline = true;
-
-    const onLoaded = () => {
+    const onLoadedMetadata = () => {
       if (video.duration && !isNaN(video.duration)) {
         duration = video.duration;
       }
     };
 
-    video.addEventListener('loadedmetadata', onLoaded);
+    video.addEventListener('loadedmetadata', onLoadedMetadata);
 
-    // Smooth Ping-Pong Animation Loop (Forward -> Reverse Rewind -> Forward)
-    let lastTimestamp = performance.now();
+    // Explicitly call play to start buffering/decoding
+    video.muted = true;
+    video.playsInline = true;
+    video.play().catch(() => {});
 
-    const loop = (now: number) => {
-      if (!isMounted) return;
+    // High frequency interval (every 30ms ~ 33 FPS) to update currentTime for smooth forward & rewind
+    intervalId = setInterval(() => {
+      if (!isMounted || !video) return;
 
-      const delta = (now - lastTimestamp) / 1000; // time in seconds
-      lastTimestamp = now;
+      if (!duration && video.duration && !isNaN(video.duration)) {
+        duration = video.duration;
+      }
 
-      // Update virtual playback head at 1.0x natural speed
       if (duration > 0) {
+        // Step size (0.04s per 30ms step)
+        const step = 0.04;
+
         if (forward) {
-          currentTime += delta;
-          if (currentTime >= duration) {
-            currentTime = duration;
-            forward = false; // Trigger smooth rewind
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
+          if (video.currentTime >= duration - 0.1) {
+            forward = false;
+            video.pause();
           }
         } else {
-          currentTime -= delta; // Smooth reverse rewind
-          if (currentTime <= 0) {
-            currentTime = 0;
-            forward = true; // Trigger forward play
+          // Reverse rewind step
+          const nextTime = video.currentTime - step;
+          if (nextTime <= 0.05) {
+            video.currentTime = 0;
+            forward = true;
+            video.play().catch(() => {});
+          } else {
+            video.currentTime = nextTime;
           }
         }
-
-        // Seek video frame
-        if (Math.abs(video.currentTime - currentTime) > 0.03) {
-          video.currentTime = currentTime;
-        }
       }
-
-      // Draw current video frame to HTML Canvas with high performance object-fit: cover
-      const dpr = window.devicePixelRatio || 1;
-      const width = canvas.clientWidth * dpr;
-      const height = canvas.clientHeight * dpr;
-
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-      }
-
-      ctx.clearRect(0, 0, width, height);
-
-      const videoWidth = video.videoWidth || 1280;
-      const videoHeight = video.videoHeight || 720;
-      const videoRatio = videoWidth / videoHeight;
-      const canvasRatio = width / height;
-
-      let drawW = width;
-      let drawH = height;
-      let offX = 0;
-      let offY = 0;
-
-      if (canvasRatio > videoRatio) {
-        drawH = width / videoRatio;
-        offY = (height - drawH) / 2;
-      } else {
-        drawW = height * videoRatio;
-        offX = (width - drawW) / 2;
-      }
-
-      try {
-        ctx.drawImage(video, offX, offY, drawW, drawH);
-      } catch (e) {
-        // Video seeking frame loading
-      }
-
-      animId = requestAnimationFrame(loop);
-    };
-
-    animId = requestAnimationFrame(loop);
+    }, 30);
 
     return () => {
       isMounted = false;
-      cancelAnimationFrame(animId);
-      video.removeEventListener('loadedmetadata', onLoaded);
+      clearInterval(intervalId);
+      video.removeEventListener('loadedmetadata', onLoadedMetadata);
     };
-  }, [srcToUse]);
+  }, []);
 
   return (
     <div className="relative w-full h-full bg-espresso overflow-hidden">
-      {/* Hidden HTML5 Video element for frame decoding */}
       <video
         ref={videoRef}
+        src="./Pouring_coffee_into_cup_202608261706.mp4"
+        autoPlay
         muted
         playsInline
         preload="auto"
-        className="hidden"
-      />
-      {/* High performance Canvas renderer */}
-      <canvas
-        ref={canvasRef}
         className="w-full h-full object-cover block"
-        style={{ width: '100%', height: '100%' }}
       />
     </div>
   );
