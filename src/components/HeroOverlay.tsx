@@ -8,8 +8,7 @@ interface HeroOverlayProps {
 }
 
 export default function HeroOverlay({ scrollProgress, onOpenReservationModal }: HeroOverlayProps) {
-  // Fade out hero content smoothly as user scrolls past 30%
-  const opacity = Math.max(0, 1 - scrollProgress * 3.2);
+  const opacity = Math.max(0, 1 - scrollProgress * 2.5);
 
   return (
     <div
@@ -82,7 +81,7 @@ export default function HeroOverlay({ scrollProgress, onOpenReservationModal }: 
         transition={{ duration: 1, delay: 1.2 }}
         className="flex flex-col items-center gap-1.5 text-coffee-300 text-[10px] sm:text-xs uppercase tracking-widest"
       >
-        <span className="shine-text-gold font-semibold">Scroll to experience animation</span>
+        <span className="shine-text-gold font-semibold">Scroll to explore</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.8 }}

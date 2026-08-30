@@ -37,7 +37,7 @@ export default function App() {
     fetchMenuData();
 
     const handleScroll = () => {
-      const maxScroll = window.innerHeight * 1.5;
+      const maxScroll = window.innerHeight * 0.8;
       const currentScroll = window.scrollY;
       const progress = Math.min(Math.max(currentScroll / maxScroll, 0), 1);
       setScrollProgress(progress);
@@ -94,14 +94,12 @@ export default function App() {
         onOpenReservationModal={() => setIsReservationModalOpen(true)}
       />
 
-      <div id="hero" className="relative h-[220vh] w-full">
-        <div className="sticky top-0 left-0 w-full h-screen overflow-hidden">
-          <CoffeeScene scrollProgress={scrollProgress} />
-          <HeroOverlay
-            scrollProgress={scrollProgress}
-            onOpenReservationModal={() => setIsReservationModalOpen(true)}
-          />
-        </div>
+      <div id="hero" className="relative h-screen w-full overflow-hidden">
+        <CoffeeScene />
+        <HeroOverlay
+          scrollProgress={scrollProgress}
+          onOpenReservationModal={() => setIsReservationModalOpen(true)}
+        />
       </div>
 
       <main className="relative z-30">
