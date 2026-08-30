@@ -72,7 +72,7 @@ export default function StorySection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-espresso via-transparent to-transparent opacity-80" />
               
-              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-6 rounded-2xl bg-espresso/90 backdrop-blur-md border border-coffee-700/60 flex items-center justify-between text-center">
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-6 rounded-2xl bg-espresso/90 backdrop-blur-md border border-coffee-700/60 flex items-center justify-around text-center">
                 <div>
                   <span className="font-serif text-2xl sm:text-3xl font-extrabold text-caramel">100%</span>
                   <p className="text-[10px] sm:text-xs text-coffee-200 uppercase tracking-wider font-medium">Arabica Beans</p>
@@ -81,11 +81,6 @@ export default function StorySection() {
                 <div>
                   <span className="font-serif text-2xl sm:text-3xl font-extrabold text-caramel">15+</span>
                   <p className="text-[10px] sm:text-xs text-coffee-200 uppercase tracking-wider font-medium">Brew Styles</p>
-                </div>
-                <div className="h-8 sm:h-10 w-[1px] bg-coffee-700" />
-                <div>
-                  <span className="font-serif text-2xl sm:text-3xl font-extrabold text-caramel">Demo</span>
-                  <p className="text-[10px] sm:text-xs text-coffee-200 uppercase tracking-wider font-medium">Sample Metric</p>
                 </div>
               </div>
             </div>

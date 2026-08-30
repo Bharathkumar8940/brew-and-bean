@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Calendar, Utensils, Table, ShoppingBag, Tag, Bell, LogOut, Trash2, Info } from 'lucide-react';
+import { LayoutDashboard, Calendar, Utensils, Table, ShoppingBag, Tag, Bell, LogOut, Trash2 } from 'lucide-react';
 import { defaultCafeConfig } from '../cafeConfig';
 
 export default function AdminDashboard() {
@@ -29,11 +29,11 @@ export default function AdminDashboard() {
   ]);
 
   const [reservations, setReservations] = useState<any[]>([
-    { id: 'r1', reservationNumber: 'BB-1024', customerName: 'Sample Guest (Demo)', customerPhone: defaultCafeConfig.contact.phone, reservationDate: '2026-09-05', reservationTime: '7:30 PM', guests: 4, tableNumber: 3, status: 'Confirmed', specialRequest: 'Window table request' }
+    { id: 'r1', reservationNumber: 'BB-1024', customerName: 'Guest Reservation', customerPhone: defaultCafeConfig.contact.phone, reservationDate: '2026-09-05', reservationTime: '7:30 PM', guests: 4, tableNumber: 3, status: 'Confirmed', specialRequest: 'Window table request' }
   ]);
 
   const [orders, setOrders] = useState<any[]>([
-    { id: 'o1', orderNumber: 'ORD-1088', customerName: 'Sample Guest (Demo)', orderType: 'Dine-in', items: [{ id: 'c2', name: 'Velvet Cappuccino', quantity: 2, unitPrice: 210 }], totalAmount: 441, orderStatus: 'Preparing', createdAt: new Date().toISOString() }
+    { id: 'o1', orderNumber: 'ORD-1088', customerName: 'Guest Order', orderType: 'Dine-in', items: [{ id: 'c2', name: 'Velvet Cappuccino', quantity: 2, unitPrice: 210 }], totalAmount: 441, orderStatus: 'Preparing', createdAt: new Date().toISOString() }
   ]);
 
   const [menuItems, setMenuItems] = useState<any[]>(defaultCafeConfig.menuItems);
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
   ]);
 
   const [notifications] = useState<any[]>([
-    { id: 'n1', title: 'System Notification Log (Demo)', message: 'WhatsApp Manager Notification Dispatched to ' + defaultCafeConfig.contact.phone, createdAt: new Date().toISOString() }
+    { id: 'n1', title: 'System Notification Log', message: 'WhatsApp Manager Notification Dispatched to ' + defaultCafeConfig.contact.phone, createdAt: new Date().toISOString() }
   ]);
 
   const [newMenuName, setNewMenuName] = useState('');
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
         if (menuData.items && menuData.items.length > 0) setMenuItems(menuData.items);
       }
     } catch (err) {
-      // Fallback cleanly to built-in sample demo metrics if backend API is not running
+      // Fallback
     }
   };
 
@@ -139,18 +139,8 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-espresso flex items-center justify-center p-6 text-cream">
         <div className="w-full max-w-md bg-coffee-950 p-8 rounded-3xl border border-coffee-800 shadow-3d">
           <div className="text-center">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-caramel px-3 py-1 rounded-full bg-coffee-900 border border-coffee-800">
-              Demo Admin Portal Preview
-            </span>
             <h2 className="font-serif text-3xl font-bold mt-3">Staff Management Portal</h2>
-            <p className="text-xs text-coffee-300 mt-1">Interactive demonstration of café operational dashboard</p>
-          </div>
-
-          <div className="mt-4 p-3 rounded-2xl bg-espresso/80 border border-coffee-800/80 text-[11px] text-coffee-300 flex items-start gap-2">
-            <Info className="w-4 h-4 text-caramel shrink-0 mt-0.5" />
-            <span>
-              <strong>Demo Credentials:</strong> Click "Log In to Portal" using pre-filled credentials to explore staff management functions.
-            </span>
+            <p className="text-xs text-coffee-300 mt-1">Café operational dashboard</p>
           </div>
 
           <form onSubmit={handleLogin} className="mt-5 space-y-4">
@@ -182,7 +172,7 @@ export default function AdminDashboard() {
               type="submit"
               className="w-full py-3.5 rounded-2xl bg-caramel hover:bg-coffee-500 text-white font-bold text-xs uppercase tracking-widest shadow-glow transition-all"
             >
-              Log In to Portal (Demo)
+              Log In to Portal
             </button>
           </form>
           <div className="mt-5 text-center">
@@ -203,7 +193,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <h3 className="font-serif font-bold text-base">{defaultCafeConfig.brand.name}</h3>
-              <span className="text-[10px] text-caramel uppercase tracking-widest font-semibold">Staff Portal (Demo)</span>
+              <span className="text-[10px] text-caramel uppercase tracking-widest font-semibold">Staff Portal</span>
             </div>
           </div>
 
@@ -238,7 +228,7 @@ export default function AdminDashboard() {
           onClick={handleLogout}
           className="flex items-center gap-2 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-6 border-t border-coffee-800"
         >
-          <LogOut className="w-4 h-4" /> Exit Portal Demo
+          <LogOut className="w-4 h-4" /> Exit Portal
         </button>
       </aside>
 
@@ -247,11 +237,11 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between pb-6 border-b border-coffee-900">
           <div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold">Café Staff Management Dashboard</h1>
-            <p className="text-xs text-coffee-300 mt-1">Interactive staff interface preview for table status, live orders & menu edits</p>
+            <p className="text-xs text-coffee-300 mt-1">Real-time table status, live orders & menu management</p>
           </div>
 
           <a href="./" className="px-4 py-2 rounded-full border border-caramel/50 text-caramel hover:bg-caramel hover:text-white text-xs font-semibold uppercase transition-colors">
-            View Website Demo ↗
+            View Website ↗
           </a>
         </div>
 
@@ -418,7 +408,7 @@ export default function AdminDashboard() {
         {activeTab === 'menu' && (
           <div className="mt-8 space-y-8">
             <div className="p-6 rounded-3xl bg-coffee-950 border border-coffee-800">
-              <h3 className="font-serif text-xl font-bold text-cream mb-4">Add New Menu Item (Demo Editor)</h3>
+              <h3 className="font-serif text-xl font-bold text-cream mb-4">Add New Menu Item</h3>
               <form onSubmit={handleCreateMenuItem} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input
                   type="text"

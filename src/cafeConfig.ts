@@ -52,8 +52,8 @@ export interface CafeConfig {
 }
 
 export const defaultCafeConfig: CafeConfig = {
-  isDemo: true,
-  demoNotice: "BREW & BEAN — DEMO EXPERIENCE",
+  isDemo: false,
+  demoNotice: "BREW & BEAN — CRAFT CAFÉ",
   brand: {
     name: "Brew & Bean",
     tagline: "Craft Café & Micro-Roasters",
@@ -72,7 +72,7 @@ export const defaultCafeConfig: CafeConfig = {
     address: "Plot 42, Heritage Boulevard, Indiranagar, Bengaluru, KA 560038",
     phone: "+91 86390 98389",
     whatsappNumber: "918639098389",
-    email: "hello@brewandbean-demo.com",
+    email: "hello@brewandbean.com",
     openingHours: {
       weekdays: "8:00 AM – 10:30 PM",
       weekends: "8:00 AM – 11:30 PM"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { PartyPopper, CheckCircle, Info } from 'lucide-react';
+import { PartyPopper, CheckCircle } from 'lucide-react';
 import { defaultCafeConfig } from '../cafeConfig';
 
 export default function EventsSection() {
@@ -67,7 +67,7 @@ export default function EventsSection() {
           >
             {!submitted ? (
               <form onSubmit={handleSubmit} className="space-y-3.5">
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream">Request Private Event (Demo)</h3>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream">Request Private Event</h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -179,7 +179,7 @@ export default function EventsSection() {
                   type="submit"
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-caramel via-amber-600 to-coffee-600 hover:from-amber-500 hover:to-caramel text-white font-bold text-xs uppercase tracking-widest shadow-glow transition-all hover:scale-[1.01] border border-amber-300/30"
                 >
-                  Submit Event Request (Demo)
+                  Submit Event Request
                 </button>
               </form>
             ) : (
@@ -187,17 +187,13 @@ export default function EventsSection() {
                 <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto animate-pulse" />
                 <h3 className="font-serif text-2xl font-bold text-cream">Event Request Received</h3>
                 <p className="text-xs text-coffee-300 max-w-xs mx-auto leading-relaxed">
-                  Thank you, <strong className="text-cream">{name}</strong>! Your demo event request for <strong className="text-caramel">{eventType}</strong> on {eventDate} has been logged.
+                  Thank you, <strong className="text-cream">{name}</strong>! Your event request for <strong className="text-caramel">{eventType}</strong> on {eventDate} has been received.
                 </p>
-                <div className="p-3 rounded-xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 text-left">
-                  <Info className="w-4 h-4 text-caramel inline mr-1" />
-                  <strong>Production Note:</strong> In a production website, this request would automatically dispatch an email/WhatsApp message to the café manager.
-                </div>
                 <button
                   onClick={() => setSubmitted(false)}
                   className="mt-2 px-6 py-2 rounded-full bg-coffee-800 text-cream text-xs uppercase font-bold tracking-wider hover:bg-caramel transition-colors"
                 >
-                  Reset Demo Form
+                  Close
                 </button>
               </div>
             )}

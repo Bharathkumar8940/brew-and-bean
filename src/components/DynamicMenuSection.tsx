@@ -44,13 +44,13 @@ export default function DynamicMenuSection({
         
         <div className="text-center max-w-3xl mx-auto">
           <span className="text-caramel uppercase tracking-[0.25em] font-semibold text-xs inline-flex items-center gap-2">
-            <Utensils className="w-4 h-4" /> Artisanal Menu (Demo Showcase)
+            <Utensils className="w-4 h-4" /> Artisanal Menu
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-cream mt-2">
             Craft Coffee & Bakery Selection
           </h2>
           <p className="text-coffee-300 mt-3 text-xs sm:text-base font-sans leading-relaxed">
-            Organized demo menu items with category filters, dietary indicators, and customizable pricing models.
+            Freshly prepared specialty coffee, handcrafted food, and artisanal desserts.
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function DynamicMenuSection({
               className="shine-sweep-container px-6 py-3.5 rounded-full bg-gradient-to-r from-caramel via-amber-600 to-coffee-600 text-white font-bold text-xs uppercase tracking-wider shadow-glow hover:shadow-3d transition-all flex items-center gap-3 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 border border-amber-300/40"
             >
               <ShoppingBag className="w-4 h-4" />
-              <span>View Order Demo ({totalCartCount} items)</span>
+              <span>View Order ({totalCartCount} items)</span>
             </button>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Clock, Phone, Navigation, MessageCircle, Info } from 'lucide-react';
+import { MapPin, Clock, Phone, Navigation, MessageCircle } from 'lucide-react';
 import { defaultCafeConfig } from '../cafeConfig';
 
 export default function Location() {
@@ -26,12 +26,6 @@ export default function Location() {
             <p className="text-coffee-300 mt-4 text-xs sm:text-base leading-relaxed">
               Located in the heart of the city's quiet cultural quarter. Drop in for your morning brew or stay late for evening conversations.
             </p>
-
-            {/* Demo Address Disclaimer */}
-            <div className="mt-4 p-3 rounded-2xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 flex items-center gap-2">
-              <Info className="w-4 h-4 text-caramel shrink-0" />
-              <span><strong>Sample Location:</strong> Replace with real client address in `cafeConfig.ts`.</span>
-            </div>
 
             <div className="mt-6 space-y-5">
               <div className="flex items-start gap-4">

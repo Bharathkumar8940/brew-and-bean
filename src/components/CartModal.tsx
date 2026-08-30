@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Trash2, Tag, ArrowRight, CheckCircle, Info } from 'lucide-react';
+import { X, ShoppingBag, Trash2, Tag, ArrowRight, CheckCircle } from 'lucide-react';
 import { type MenuItemData } from './DynamicMenuSection';
 import { defaultCafeConfig } from '../cafeConfig';
 
@@ -50,19 +50,19 @@ export default function CartModal({
     const cleanCode = couponCode.trim().toUpperCase();
     if (cleanCode === 'WELCOME50' || cleanCode === 'BREW20') {
       setDiscountPercent(20);
-      setCouponMsg('Demo Promo Code Applied! 20% Discount');
+      setCouponMsg('Promo Code Applied! 20% Discount');
     } else if (cleanCode === 'BREWBEANS') {
       setDiscountPercent(15);
-      setCouponMsg('Demo Promo Code Applied! 15% Discount');
+      setCouponMsg('Promo Code Applied! 15% Discount');
     } else {
-      setCouponMsg('Invalid demo code. Try WELCOME50');
+      setCouponMsg('Invalid promo code. Try WELCOME50');
     }
   };
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
     const demoOrder = {
-      orderNumber: `ORD-DEMO-${Math.floor(1000 + Math.random() * 9000)}`,
+      orderNumber: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
       customerName: name,
       customerPhone: phone,
       orderType,
@@ -105,18 +105,10 @@ export default function CartModal({
               </div>
               <div>
                 <h3 id="cart-modal-title" className="font-serif text-xl sm:text-2xl font-bold">
-                  Your Order Cart (Demo Flow)
+                  Your Order Cart
                 </h3>
                 <p className="text-xs text-coffee-300">{cartItemDetails.length} items selected</p>
               </div>
-            </div>
-
-            {/* Demo Notice Banner */}
-            <div className="mt-4 p-3 rounded-2xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-caramel shrink-0 mt-0.5" />
-              <span>
-                <strong className="text-cream">Demo Checkout:</strong> Experience our online ordering workflow. In a production client installation, this connects to Razorpay / Stripe or WhatsApp order dispatch.
-              </span>
             </div>
 
             {/* Order Type Toggle */}
@@ -169,7 +161,7 @@ export default function CartModal({
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Demo Coupon (e.g. WELCOME50)"
+                  placeholder="Coupon Code (e.g. WELCOME50)"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   className="w-full pl-8 pr-3 py-2 rounded-xl bg-coffee-950 border border-coffee-800 text-xs text-cream uppercase focus:border-caramel focus:outline-none"
@@ -194,7 +186,7 @@ export default function CartModal({
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-emerald-400 font-medium">
-                  <span>Demo Coupon Discount ({discountPercent}%):</span>
+                  <span>Coupon Discount ({discountPercent}%):</span>
                   <span>-₹{discount}</span>
                 </div>
               )}
@@ -275,7 +267,7 @@ export default function CartModal({
 
               <div>
                 <label className="block text-[11px] uppercase font-semibold text-coffee-300 mb-1">
-                  Special Cooking Instructions (Optional)
+                  Special Instructions (Optional)
                 </label>
                 <input
                   type="text"
@@ -291,7 +283,7 @@ export default function CartModal({
                 disabled={cartItemDetails.length === 0}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-caramel via-amber-600 to-coffee-600 hover:from-amber-500 hover:to-caramel disabled:opacity-50 text-white font-bold text-xs uppercase tracking-widest shadow-glow transition-all hover:scale-[1.01] mt-2 flex items-center justify-center gap-2 border border-amber-300/30"
               >
-                Place Demo Order (₹{totalAmount}) <ArrowRight className="w-4 h-4" />
+                Place Order (₹{totalAmount}) <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           </div>
@@ -301,10 +293,10 @@ export default function CartModal({
               <CheckCircle className="w-7 h-7" />
             </div>
 
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream">Demo Order Placed!</h3>
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream">Order Placed!</h3>
 
             <p className="text-coffee-300 text-xs leading-relaxed max-w-xs mx-auto">
-              Sample order <span className="text-caramel font-semibold">{submittedOrder.orderNumber}</span> has been processed in this demo interface.
+              Order <span className="text-caramel font-semibold">{submittedOrder.orderNumber}</span> has been successfully placed.
             </p>
 
             <div className="p-3.5 rounded-2xl bg-coffee-950 border border-coffee-800 text-xs text-left space-y-2">
@@ -322,15 +314,11 @@ export default function CartModal({
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 text-left">
-              💡 <strong>Production Note:</strong> On a live client deployment, this step triggers instant SMS updates and dispatches payment processing.
-            </div>
-
             <button
               onClick={handleCloseAll}
               className="mt-4 px-7 py-2.5 rounded-full bg-coffee-800 hover:bg-caramel text-cream text-xs uppercase font-bold tracking-wider transition-colors"
             >
-              Back to Café Demo
+              Back to Menu
             </button>
           </div>
         )}

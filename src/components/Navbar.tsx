@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Coffee, ShoppingBag, Menu as MenuIcon, X, Calendar, Shield, Sparkles } from 'lucide-react';
+import { Coffee, ShoppingBag, Menu as MenuIcon, X, Calendar, Shield } from 'lucide-react';
 import { defaultCafeConfig } from '../cafeConfig';
 
 interface NavbarProps {
@@ -39,16 +39,7 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
           : 'bg-transparent py-5'
       }`}
     >
-      {/* Top Demo Banner */}
-      {defaultCafeConfig.isDemo && (
-        <div className="bg-coffee-950/90 border-b border-coffee-800/60 py-1 px-4 text-center text-[10px] sm:text-xs font-semibold tracking-widest text-caramel uppercase flex items-center justify-center gap-1.5">
-          <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
-          <span>{defaultCafeConfig.demoNotice}</span>
-          <span className="hidden sm:inline text-coffee-400">| Customizable Portfolio Template</span>
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between mt-1">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
         {/* Brand Logo */}
         <a href="#hero" className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-caramel rounded-lg">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-coffee-800 via-caramel to-amber-400 flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform shine-gold-border">
@@ -81,10 +72,10 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
         <div className="hidden md:flex items-center gap-2.5 sm:gap-3">
           <a
             href="./?page=admin"
-            title="Demo Staff & Admin Management Portal Preview"
+            title="Staff & Admin Management Portal"
             className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-coffee-300 hover:text-caramel transition-colors px-3 py-2 border border-coffee-800/80 rounded-full hover:border-caramel/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-caramel"
           >
-            <Shield className="w-3.5 h-3.5 text-caramel/80" /> Staff Portal (Demo)
+            <Shield className="w-3.5 h-3.5 text-caramel/80" /> Staff Portal
           </a>
 
           <button
@@ -136,7 +127,7 @@ export default function Navbar({ onOpenOrderModal, onOpenReservationModal }: Nav
                 className="w-full flex items-center justify-center gap-2 border border-coffee-700 text-coffee-300 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider"
               >
                 <Shield className="w-4 h-4 text-caramel" />
-                Staff Portal (Demo Preview)
+                Staff Portal
               </a>
 
               <button

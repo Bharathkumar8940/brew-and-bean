@@ -1,4 +1,4 @@
-import { Coffee, MessageCircle, Heart, Sparkles } from 'lucide-react';
+import { Coffee, MessageCircle, Heart } from 'lucide-react';
 import { defaultCafeConfig } from '../cafeConfig';
 
 export default function Footer() {
@@ -18,14 +18,8 @@ export default function Footer() {
               </span>
             </a>
             <p className="text-xs text-coffee-400 mt-4 leading-relaxed">
-              Craft coffee showcase template featuring artisanal roasts, handmade pasta, and fresh desserts.
+              Craft coffee shop serving single-origin roasts, handmade pasta, and fresh desserts.
             </p>
-            {defaultCafeConfig.isDemo && (
-              <div className="mt-4 p-2.5 rounded-xl bg-coffee-950/90 border border-coffee-800/80 text-[11px] text-caramel font-semibold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                <span>Demo Website — Concept Project</span>
-              </div>
-            )}
           </div>
 
           <div>
@@ -37,12 +31,12 @@ export default function Footer() {
               <li><a href="#reservations-section" className="hover:text-caramel transition-colors">Table Reservations</a></li>
               <li><a href="#experience" className="hover:text-caramel transition-colors">Café Atmosphere</a></li>
               <li><a href="#events-section" className="hover:text-caramel transition-colors">Private Events</a></li>
-              <li><a href="./?page=admin" className="hover:text-caramel transition-colors">Staff Portal (Demo)</a></li>
+              <li><a href="./?page=admin" className="hover:text-caramel transition-colors">Staff Portal</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Sample Location</h4>
+            <h4 className="font-serif text-cream font-bold text-sm uppercase tracking-wider">Our Location</h4>
             <p className="text-xs text-coffee-400 mt-4 leading-relaxed">
               {defaultCafeConfig.contact.address}
             </p>
@@ -73,9 +67,9 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-coffee-400 gap-2">
-          <p>© {new Date().getFullYear()} {defaultCafeConfig.brand.name} Café. Portfolio Concept Project.</p>
+          <p>© {new Date().getFullYear()} {defaultCafeConfig.brand.name} Café. All rights reserved.</p>
           <p className="flex items-center gap-1">
-            Crafted with <Heart className="w-3.5 h-3.5 text-caramel fill-current" /> for Premium Café Websites
+            Crafted with <Heart className="w-3.5 h-3.5 text-caramel fill-current" />
           </p>
         </div>
 

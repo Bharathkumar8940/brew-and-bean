@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, CheckCircle, Info } from 'lucide-react';
-import { defaultCafeConfig } from '../cafeConfig';
+import { Calendar, CheckCircle } from 'lucide-react';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -22,7 +21,7 @@ export default function TableReservationModal({ isOpen, onClose }: ReservationMo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const generatedId = `BB-DEMO-${Math.floor(1000 + Math.random() * 9000)}`;
+    const generatedId = `BB-${Math.floor(1000 + Math.random() * 9000)}`;
     setReservationId(generatedId);
     setSubmitted(true);
   };
@@ -58,18 +57,10 @@ export default function TableReservationModal({ isOpen, onClose }: ReservationMo
               </div>
               <div>
                 <h3 id="reservation-modal-title" className="font-serif text-xl sm:text-2xl font-bold">
-                  Book a Table (Demo Flow)
+                  Book a Table
                 </h3>
-                <p className="text-xs text-coffee-300">Experience our interactive guest reservation process</p>
+                <p className="text-xs text-coffee-300">Reserve your table with us</p>
               </div>
-            </div>
-
-            {/* Demo Notice Banner */}
-            <div className="mt-4 p-3 rounded-2xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-caramel shrink-0 mt-0.5" />
-              <span>
-                <strong className="text-cream">Portfolio Demo Mode:</strong> Submitting this form simulates a reservation request. In a live production deployment, this request automatically routes to your café management dashboard or WhatsApp desk.
-              </span>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
@@ -184,7 +175,7 @@ export default function TableReservationModal({ isOpen, onClose }: ReservationMo
                 type="submit"
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-caramel via-amber-600 to-coffee-600 hover:from-amber-500 hover:to-caramel text-white font-bold text-xs uppercase tracking-widest shadow-glow transition-all hover:scale-[1.01] mt-2 border border-amber-300/30"
               >
-                Submit Reservation Request (Demo)
+                Submit Reservation Request
               </button>
             </form>
           </div>
@@ -197,7 +188,7 @@ export default function TableReservationModal({ isOpen, onClose }: ReservationMo
             <h3 className="font-serif text-2xl font-bold text-cream">Reservation Request Received</h3>
 
             <p className="text-xs text-coffee-300 max-w-xs mx-auto leading-relaxed">
-              Your sample booking request <strong className="text-caramel">{reservationId}</strong> has been logged into the demo interface.
+              Your booking request <strong className="text-caramel">{reservationId}</strong> has been received.
             </p>
 
             <div className="p-4 rounded-2xl bg-coffee-950 border border-coffee-800/80 text-left space-y-2 text-xs">
@@ -215,19 +206,15 @@ export default function TableReservationModal({ isOpen, onClose }: ReservationMo
               </div>
               <div className="flex justify-between">
                 <span className="text-coffee-400">Status:</span>
-                <span className="font-bold text-amber-400">Request Pending Café Confirmation</span>
+                <span className="font-bold text-amber-400">Request Pending Confirmation</span>
               </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-coffee-950/80 border border-coffee-800/80 text-[11px] text-coffee-300 text-left">
-              💡 <strong>Production Note:</strong> In a real client installation, this form triggers an instant WhatsApp confirmation to {defaultCafeConfig.contact.phone} and logs into the manager dashboard.
             </div>
 
             <button
               onClick={handleReset}
               className="mt-2 px-6 py-2.5 rounded-full bg-caramel text-white text-xs font-bold uppercase tracking-wider hover:bg-coffee-500 transition-colors"
             >
-              Close Demo Window
+              Close
             </button>
           </div>
         )}
