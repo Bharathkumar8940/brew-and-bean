@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 
 interface AutoPlayVideoProps {
-  scrollProgress?: number;
   videoSrc?: string;
 }
 
@@ -9,25 +8,56 @@ export default function CoffeeScene({
   videoSrc = './Pouring_coffee_into_cup_202608261706.mp4',
 }: AutoPlayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isRewindingRef = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Ensure video plays continuously on loop
     video.muted = true;
-    video.loop = true;
     video.playsInline = true;
+    video.loop = false; // Disable standard loop to handle reverse rewind manually
+
+    let animationFrameId: number;
+
+    const handleEnded = () => {
+      isRewindingRef.current = true;
+    };
+
+    const updateFrame = () => {
+      if (isRewindingRef.current && video) {
+        // Rewind speed step (0.04 seconds per frame ~ 25 FPS reverse speed)
+        const nextTime = video.currentTime - 0.04;
+        
+        if (nextTime <= 0.05) {
+          video.currentTime = 0;
+          isRewindingRef.current = false;
+          video.play().catch(() => {});
+        } else {
+          video.currentTime = nextTime;
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(updateFrame);
+    };
+
+    video.addEventListener('ended', handleEnded);
 
     const playVideo = async () => {
       try {
         await video.play();
       } catch (err) {
-        console.warn('Autoplay prevented by browser:', err);
+        console.warn('Autoplay prevented:', err);
       }
     };
 
     playVideo();
+    animationFrameId = requestAnimationFrame(updateFrame);
+
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [videoSrc]);
 
   return (
@@ -36,7 +66,6 @@ export default function CoffeeScene({
         ref={videoRef}
         src={videoSrc}
         autoPlay
-        loop
         muted
         playsInline
         preload="auto"
