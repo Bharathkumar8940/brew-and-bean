@@ -1,22 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import videoUrl from '/Pouring_coffee_into_cup_202608261706.mp4?url';
 
 export default function CoffeeScene() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Detect mobile viewport (width <= 768px)
-    const checkMobile = () => {
-      const mobileQuery = window.matchMedia('(max-width: 768px)').matches;
-      setIsMobile(mobileQuery);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
     const video = videoRef.current;
-    if (!video || isMobile) return () => window.removeEventListener('resize', checkMobile);
+    if (!video) return;
+
+    // Check if device is mobile/tablet using window width or touch points
+    const isMobileDevice = window.innerWidth <= 768 || 'ontouchstart' in window;
+    
+    // On mobile devices, do not run reverse seeking intervals
+    if (isMobileDevice) {
+      return;
+    }
 
     let isMounted = true;
     let forward = true;
@@ -35,7 +33,7 @@ export default function CoffeeScene() {
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.play().catch(() => {});
 
-    // Desktop/Laptop: Smooth forward & reverse rewind loop
+    // Laptop / Desktop: Smooth forward & reverse rewind loop
     intervalId = setInterval(() => {
       if (!isMounted || !video) return;
 
@@ -71,33 +69,37 @@ export default function CoffeeScene() {
       isMounted = false;
       clearInterval(intervalId);
       video.removeEventListener('loadedmetadata', onLoadedMetadata);
-      window.removeEventListener('resize', checkMobile);
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <div className="relative w-full h-full bg-espresso overflow-hidden">
-      {/* Show beautiful static fallback background on Mobile; Show Video on Laptop/Desktop */}
-      {isMobile ? (
-        <div
-          className="w-full h-full bg-cover bg-center brightness-90 transform-gpu"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=80')`,
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-espresso/80 via-espresso/50 to-espresso" />
-        </div>
-      ) : (
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          className="w-full h-full object-cover block transform-gpu translate-z-0"
+      {/* 
+        Tailwind CSS Responsive Display:
+        - hidden md:block: Video element ONLY renders on Desktop / Laptop screens (md breakpoint and up >=768px).
+        - block md:hidden: High-resolution static image renders ONLY on Mobile screens (<768px).
+      */}
+      
+      {/* Mobile-Only Static Image Background */}
+      <div className="block md:hidden w-full h-full relative">
+        <img
+          src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=80"
+          alt="Artisanal Coffee"
+          className="w-full h-full object-cover brightness-75"
         />
-      )}
+        <div className="absolute inset-0 bg-gradient-to-b from-espresso/80 via-espresso/40 to-espresso" />
+      </div>
+
+      {/* Laptop & Desktop-Only Video Element */}
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        className="hidden md:block w-full h-full object-cover transform-gpu translate-z-0"
+      />
     </div>
   );
 }
