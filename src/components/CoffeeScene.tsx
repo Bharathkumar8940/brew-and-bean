@@ -6,18 +6,17 @@ export default function CoffeeScene() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Detect mobile / low power devices
+    // Detect mobile viewport (width <= 768px)
     const checkMobile = () => {
       const mobileQuery = window.matchMedia('(max-width: 768px)').matches;
-      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      setIsMobile(mobileQuery || isTouch);
+      setIsMobile(mobileQuery);
     };
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
     const video = videoRef.current;
-    if (!video) return () => window.removeEventListener('resize', checkMobile);
+    if (!video || isMobile) return () => window.removeEventListener('resize', checkMobile);
 
     let isMounted = true;
     let forward = true;
@@ -26,13 +25,6 @@ export default function CoffeeScene() {
 
     video.muted = true;
     video.playsInline = true;
-    
-    // On mobile devices, use native GPU video decoding & looping to avoid CPU seeking lag
-    if (isMobile) {
-      video.loop = true;
-      video.play().catch(() => {});
-      return () => window.removeEventListener('resize', checkMobile);
-    }
 
     const onLoadedMetadata = () => {
       if (video.duration && !isNaN(video.duration)) {
@@ -43,7 +35,7 @@ export default function CoffeeScene() {
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.play().catch(() => {});
 
-    // Desktop: High-performance smooth rewind cycle
+    // Desktop/Laptop: Smooth forward & reverse rewind loop
     intervalId = setInterval(() => {
       if (!isMounted || !video) return;
 
@@ -85,15 +77,27 @@ export default function CoffeeScene() {
 
   return (
     <div className="relative w-full h-full bg-espresso overflow-hidden">
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        autoPlay
-        muted
-        playsInline
-        preload="metadata"
-        className="w-full h-full object-cover block transform-gpu translate-z-0"
-      />
+      {/* Show beautiful static fallback background on Mobile; Show Video on Laptop/Desktop */}
+      {isMobile ? (
+        <div
+          className="w-full h-full bg-cover bg-center brightness-90 transform-gpu"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=80')`,
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-espresso/80 via-espresso/50 to-espresso" />
+        </div>
+      ) : (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover block transform-gpu translate-z-0"
+        />
+      )}
     </div>
   );
 }
