@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import CoffeeScene from './components/CoffeeScene';
 import HeroOverlay from './components/HeroOverlay';
 import StorySection from './components/StorySection';
 import DynamicMenuSection, { type MenuItemData } from './components/DynamicMenuSection';
-import CafeExperience from './components/CafeExperience';
-import WhyUs from './components/WhyUs';
-import Testimonials from './components/Testimonials';
-import Gallery from './components/Gallery';
-import Location from './components/Location';
-import FinalCTA from './components/FinalCTA';
-import Footer from './components/Footer';
-import CartModal from './components/CartModal';
-import TableReservationModal from './components/TableReservationModal';
-import EventsSection from './components/EventsSection';
-import AdminDashboard from './components/AdminDashboard';
+
+// Lazy load non-critical below-the-fold components to improve mobile load speed & memory efficiency
+const CafeExperience = lazy(() => import('./components/CafeExperience'));
+const WhyUs = lazy(() => import('./components/WhyUs'));
+const Testimonials = lazy(() => import('./components/Testimonials'));
+const Gallery = lazy(() => import('./components/Gallery'));
+const Location = lazy(() => import('./components/Location'));
+const FinalCTA = lazy(() => import('./components/FinalCTA'));
+const Footer = lazy(() => import('./components/Footer'));
+const CartModal = lazy(() => import('./components/CartModal'));
+const TableReservationModal = lazy(() => import('./components/TableReservationModal'));
+const EventsSection = lazy(() => import('./components/EventsSection'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -36,11 +38,19 @@ export default function App() {
   useEffect(() => {
     fetchMenuData();
 
+    let ticking = false;
+
     const handleScroll = () => {
-      const maxScroll = window.innerHeight * 0.8;
-      const currentScroll = window.scrollY;
-      const progress = Math.min(Math.max(currentScroll / maxScroll, 0), 1);
-      setScrollProgress(progress);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const maxScroll = window.innerHeight * 0.8;
+          const currentScroll = window.scrollY;
+          const progress = Math.min(Math.max(currentScroll / maxScroll, 0), 1);
+          setScrollProgress(progress);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -56,7 +66,7 @@ export default function App() {
         setMenuItems(data.items);
       }
     } catch (e) {
-      console.error('API menu fetch error:', e);
+      // Clean fallback if local server is not running
     }
   };
 
@@ -84,7 +94,11 @@ export default function App() {
   };
 
   if (isStaffRoute) {
-    return <AdminDashboard />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-espresso flex items-center justify-center text-cream text-xs">Loading Staff Portal...</div>}>
+        <AdminDashboard />
+      </Suspense>
+    );
   }
 
   return (
@@ -114,36 +128,41 @@ export default function App() {
           onOpenCartModal={() => setIsCartModalOpen(true)}
         />
 
-        <CafeExperience />
-        <WhyUs />
-        <Testimonials />
-
-        <EventsSection />
-
-        <Gallery />
-        <Location />
-
-        <FinalCTA
-          onOpenOrderModal={() => setIsCartModalOpen(true)}
-          onOpenReservationModal={() => setIsReservationModalOpen(true)}
-        />
+        <Suspense fallback={<div className="py-12 text-center text-xs text-coffee-400">Loading experience...</div>}>
+          <CafeExperience />
+          <WhyUs />
+          <Testimonials />
+          <EventsSection />
+          <Gallery />
+          <Location />
+          <FinalCTA
+            onOpenOrderModal={() => setIsCartModalOpen(true)}
+            onOpenReservationModal={() => setIsReservationModalOpen(true)}
+          />
+        </Suspense>
       </main>
 
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
 
-      <CartModal
-        isOpen={isCartModalOpen}
-        onClose={() => setIsCartModalOpen(false)}
-        cart={cart}
-        menuItems={menuItems}
-        onRemoveFromCart={handleRemoveFromCart}
-        onClearCart={handleClearCart}
-      />
+        {isCartModalOpen && (
+          <CartModal
+            isOpen={isCartModalOpen}
+            onClose={() => setIsCartModalOpen(false)}
+            cart={cart}
+            menuItems={menuItems}
+            onRemoveFromCart={handleRemoveFromCart}
+            onClearCart={handleClearCart}
+          />
+        )}
 
-      <TableReservationModal
-        isOpen={isReservationModalOpen}
-        onClose={() => setIsReservationModalOpen(false)}
-      />
+        {isReservationModalOpen && (
+          <TableReservationModal
+            isOpen={isReservationModalOpen}
+            onClose={() => setIsReservationModalOpen(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
